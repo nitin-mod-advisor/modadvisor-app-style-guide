@@ -3,6 +3,7 @@
 import React from 'react';
 import type { ColorToken } from '@/lib/style-guide-data';
 import { useTheme } from '@/components/theme-provider';
+import { Input } from '@/components/ui/input';
 
 interface ColorPaletteProps {
   tokens: ColorToken[];
@@ -11,6 +12,15 @@ interface ColorPaletteProps {
 
 export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
   const { theme } = useTheme();
+
+  const handleTextChange = (tokenName: string, theme: 'light' | 'dark', value: string) => {
+    // Basic validation for hex code
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(value) || /^rgba?\(.+\)$/i.test(value) || value === 'transparent') {
+      onColorChange(tokenName, theme, value);
+    } else if (/^#([0-9A-F]{0,6})$/i.test(value) || value === '') {
+       onColorChange(tokenName, theme, value);
+    }
+  };
 
   return (
     <section>
@@ -32,26 +42,50 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
                 <td className="p-3 text-sm text-text-muted">{token.role}</td>
                 <td className="p-3">
                   <div className="flex items-center gap-2">
-                    <input
-                      type="color"
+                    <div className="relative w-8 h-8">
+                      <input
+                        type="color"
+                        value={token.light.startsWith('#') ? token.light : '#ffffff'}
+                        onChange={(e) => onColorChange(token.name, 'light', e.target.value)}
+                        className="w-full h-full p-0 border-none rounded-md cursor-pointer bg-transparent absolute inset-0 opacity-0"
+                        aria-label={`Light theme color for ${token.name}`}
+                      />
+                       <div 
+                        className="w-8 h-8 rounded-md border border-border"
+                        style={{ backgroundColor: token.light }}
+                      />
+                    </div>
+                    <Input
+                      type="text"
                       value={token.light}
-                      onChange={(e) => onColorChange(token.name, 'light', e.target.value)}
-                      className="w-8 h-8 p-0 border-none rounded-md cursor-pointer bg-transparent"
-                      aria-label={`Light theme color for ${token.name}`}
+                      onChange={(e) => handleTextChange(token.name, 'light', e.target.value)}
+                      className="font-mono text-sm w-32"
+                      aria-label={`Light theme hex code for ${token.name}`}
                     />
-                    <span className="font-mono text-sm">{token.light}</span>
                   </div>
                 </td>
                 <td className="p-3">
                   <div className="flex items-center gap-2">
-                    <input
-                      type="color"
+                     <div className="relative w-8 h-8">
+                      <input
+                        type="color"
+                        value={token.dark.startsWith('#') ? token.dark : '#000000'}
+                        onChange={(e) => onColorChange(token.name, 'dark', e.target.value)}
+                        className="w-full h-full p-0 border-none rounded-md cursor-pointer bg-transparent absolute inset-0 opacity-0"
+                        aria-label={`Dark theme color for ${token.name}`}
+                      />
+                       <div 
+                        className="w-8 h-8 rounded-md border border-border"
+                        style={{ backgroundColor: token.dark }}
+                      />
+                    </div>
+                    <Input
+                      type="text"
                       value={token.dark}
-                      onChange={(e) => onColorChange(token.name, 'dark', e.target.value)}
-                      className="w-8 h-8 p-0 border-none rounded-md cursor-pointer bg-transparent"
-                       aria-label={`Dark theme color for ${token.name}`}
+                      onChange={(e) => handleTextChange(token.name, 'dark', e.target.value)}
+                      className="font-mono text-sm w-32"
+                      aria-label={`Dark theme hex code for ${token.name}`}
                     />
-                    <span className="font-mono text-sm">{token.dark}</span>
                   </div>
                 </td>
               </tr>
