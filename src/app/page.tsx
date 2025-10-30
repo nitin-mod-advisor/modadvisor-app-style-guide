@@ -60,18 +60,17 @@ export default function Home() {
       styleTag.id = styleId;
       document.head.appendChild(styleTag);
     }
+    
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const root = document.documentElement;
 
-    const lightThemeCss = tokens.map(t => `${t.name}: ${t.light};`).join('\n  ');
-    const darkThemeCss = tokens.map(t => `${t.name}: ${t.dark};`).join('\n  ');
-
-    styleTag.innerHTML = `
-[data-theme="light"] {
-  ${lightThemeCss}
-}
-[data-theme="dark"] {
-  ${darkThemeCss}
-}
-    `.trim();
+    tokens.forEach(token => {
+      const value = theme === 'light' ? token.light : token.dark;
+       if (value.startsWith('hsl')) {
+        const hslValues = value.replace('hsl(', '').replace(')', '').replace(/%/g, '');
+        root.style.setProperty(token.name, hslValues);
+      }
+    });
 
   }, [tokens, isClient]);
 

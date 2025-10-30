@@ -15,62 +15,60 @@ export default {
         code: ['monospace'],
       },
       colors: {
-        bg: 'var(--bg)',
-        surface: 'var(--surface)',
-        'surface-2': 'var(--surface-2)',
-        text: 'var(--text)',
-        'text-muted': 'var(--text-muted)',
-        border: 'var(--border)',
-        ring: 'var(--ring)',
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: 'var(--primary)',
-          foreground: 'var(--primary-foreground)',
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'var(--secondary)',
-          foreground: 'var(--secondary-foreground)',
-        },
-        accent: {
-          DEFAULT: 'var(--accent)',
-          foreground: 'var(--accent-foreground)',
-        },
-        success: 'var(--success)',
-        warning: 'var(--warning)',
-        error: 'var(--error)',
-        info: 'var(--info)',
-
-        // For shadcn component compatibility
-        background: 'var(--bg)',
-        foreground: 'var(--text)',
-        card: {
-          DEFAULT: 'var(--surface)',
-          foreground: 'var(--text)',
-        },
-        popover: {
-          DEFAULT: 'var(--surface)',
-          foreground: 'var(--text)',
-        },
-        muted: {
-          DEFAULT: 'var(--surface-2)',
-          foreground: 'var(--text-muted)',
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
         },
         destructive: {
-          DEFAULT: 'var(--error)',
-          foreground: 'var(--primary-foreground)',
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
         },
-        input: 'var(--border)',
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+        sidebar: {
+          background: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+        },
+        // Legacy for components that might still use them
+        bg: 'hsl(var(--background))',
+        surface: 'hsl(var(--card))',
+        'surface-2': 'hsl(var(--muted))',
+        text: 'hsl(var(--foreground))',
+        'text-muted': 'hsl(var(--muted-foreground))',
       },
       borderRadius: {
-        sm: "var(--radius-sm)",
-        DEFAULT: "var(--radius-md)",
-        md: "var(--radius-md)",
-        lg: "var(--radius-lg)",
-        full: "var(--radius-full)"
-      },
-      boxShadow: {
-        sm: "var(--shadow-sm)",
-        md: "var(--shadow-md)",
-        lg: "var(--shadow-lg)"
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
         'accordion-down': {

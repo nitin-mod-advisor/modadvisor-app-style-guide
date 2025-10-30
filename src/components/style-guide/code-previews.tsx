@@ -36,7 +36,7 @@ const CodeBlock: React.FC<{ title: string; code: string; language: string; fileN
 
   return (
     <div>
-      <h3 className="font-semibold text-lg text-text-muted mb-2">{title}</h3>
+      <h3 className="font-semibold text-lg text-muted-foreground mb-2">{title}</h3>
       <div className="relative group">
         <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={copyToClipboard} aria-label="Copy code">
@@ -46,7 +46,7 @@ const CodeBlock: React.FC<{ title: string; code: string; language: string; fileN
             <Download className="h-4 w-4" />
           </Button>
         </div>
-        <pre className="bg-surface border border-border rounded-lg p-4 text-xs font-mono overflow-x-auto">
+        <pre className="bg-muted border border-border rounded-lg p-4 text-xs font-mono overflow-x-auto">
           <code className={`language-${language}`}>{code}</code>
         </pre>
       </div>
@@ -56,13 +56,13 @@ const CodeBlock: React.FC<{ title: string; code: string; language: string; fileN
 
 export function CodePreviews({ tokens }: CodePreviewsProps) {
   const cssCode = `/* LIGHT THEME */
-[data-theme="light"] {
-${tokens.map(t => `  ${t.name}: ${t.light};`).join('\n')}
+:root, [data-theme="light"] {
+${tokens.map(t => `  ${t.name}: ${t.light.replace('hsl(','').replace(')','')};`).join('\n')}
 }
 
 /* DARK THEME */
 [data-theme="dark"] {
-${tokens.map(t => `  ${t.name}: ${t.dark};`).join('\n')}
+${tokens.map(t => `  ${t.name}: ${t.dark.replace('hsl(','').replace(')','')};`).join('\n')}
 }`;
 
   const tailwindCode = `// tailwind.config.js
@@ -71,42 +71,45 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg: 'var(--bg)',
-        surface: 'var(--surface)',
-        'surface-2': 'var(--surface-2)',
-        text: 'var(--text)',
-        'text-muted': 'var(--text-muted)',
-        border: 'var(--border)',
-        ring: 'var(--ring)',
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: 'var(--primary)',
-          foreground: 'var(--primary-foreground)',
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'var(--secondary)',
-          foreground: 'var(--secondary-foreground)',
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: 'var(--accent)',
-          foreground: 'var(--accent-foreground)',
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
         },
-        success: 'var(--success)',
-        warning: 'var(--warning)',
-        error: 'var(--error)',
-        info: 'var(--info)',
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
       },
       borderRadius: {
-        sm: "var(--radius-sm)",
-        DEFAULT: "var(--radius-md)",
-        md: "var(--radius-md)",
-        lg: "var(--radius-lg)",
-        full: "var(--radius-full)"
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
-      boxShadow: {
-        sm: "var(--shadow-sm)",
-        md: "var(--shadow-md)",
-        lg: "var(--shadow-lg)"
-      }
     }
   }
 };`;
