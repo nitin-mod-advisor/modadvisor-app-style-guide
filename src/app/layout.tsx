@@ -25,9 +25,9 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <FirebaseClientProvider>
           <ThemeProvider
-            attribute="data-theme"
+            attribute="class"
             defaultTheme="light"
-            enableSystem={false}
+            enableSystem
           >
             <LiveStyleGuide>
               {children}

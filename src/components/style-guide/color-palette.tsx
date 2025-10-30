@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ColorToken } from '@/lib/types';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from 'next-themes';
 import { Input } from '@/components/ui/input';
 
 interface ColorPaletteProps {

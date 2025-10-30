@@ -7,6 +7,7 @@ import { ColorPalette } from '@/components/style-guide/color-palette';
 import { CodePreviews } from '@/components/style-guide/code-previews';
 import { type ColorToken, type ColorPalette as ColorPaletteType } from '@/lib/types';
 import { useFirestore, useDoc, useMemoFirebase, useUser, initiateAnonymousSignIn, useAuth } from '@/firebase';
+import { useTheme } from 'next-themes';
 
 const PALETTE_ID = "default-palette";
 
@@ -17,30 +18,32 @@ export default function Home() {
   const firestore = useFirestore();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
+  const { theme } = useTheme();
   
   const paletteRef = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
+    if (!firestore) return null;
     return doc(firestore, "palettes", PALETTE_ID);
-  }, [firestore, user]);
+  }, [firestore]);
 
   const { data: paletteData, isLoading: isPaletteLoading } = useDoc<ColorPaletteType>(paletteRef);
-
+  
   useEffect(() => {
-    setIsClient(true);
-    if (!user && !isUserLoading) {
+    if (!user && !isUserLoading && auth) {
       initiateAnonymousSignIn(auth);
     }
   }, [user, isUserLoading, auth]);
 
   useEffect(() => {
-    // When data is loaded and exists, update the local state.
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
     if (paletteData) {
       setTokens(paletteData.tokens);
     }
   }, [paletteData]);
 
   useEffect(() => {
-    // When loading is finished and no data exists, create it.
     if (!isPaletteLoading && !paletteData && paletteRef) {
       const initialPalette: ColorPaletteType = {
         id: PALETTE_ID,
@@ -61,18 +64,21 @@ export default function Home() {
       document.head.appendChild(styleTag);
     }
     
-    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const currentTheme = theme === 'system' 
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light' 
+      : theme;
+
     const root = document.documentElement;
 
     tokens.forEach(token => {
-      const value = theme === 'light' ? token.light : token.dark;
+      const value = currentTheme === 'light' ? token.light : token.dark;
        if (value.startsWith('hsl')) {
         const hslValues = value.replace('hsl(', '').replace(')', '').replace(/%/g, '');
         root.style.setProperty(token.name, hslValues);
       }
     });
 
-  }, [tokens, isClient]);
+  }, [tokens, theme, isClient]);
 
   const handleColorChange = (tokenName: string, theme: 'light' | 'dark', value: string) => {
     const newTokens = tokens.map(token =>

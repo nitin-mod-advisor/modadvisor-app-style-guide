@@ -4,10 +4,6 @@
 
 @layer base {
   :root {
-    --radius: 0.5rem;
-  }
- 
-  :root, [data-theme="light"] {
     --background: 240 10% 98%;
     --foreground: 222.2 84% 4.9%;
 
@@ -39,6 +35,8 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 160 83% 40%;
 
+    --radius: 0.5rem;
+
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -68,7 +66,7 @@
     --radius-lg: calc(var(--radius) + 2px);
   }
 
-  [data-theme="dark"] {
+  .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
