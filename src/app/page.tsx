@@ -158,8 +158,8 @@ export default function Home() {
 
   // Effect for bootstrapping the initial palette in Firestore
   useEffect(() => {
-    // This effect runs once after the initial loading state is resolved.
-    // If there's no data, it means the document doesn't exist, so we create it.
+    // This effect runs when loading is finished.
+    // If there's no data, it means the document doesn't exist, so we create it ONCE.
     if (!isPaletteLoading && !paletteData && paletteRef) {
       const initialPalette: ColorPaletteType = {
         id: PALETTE_ID,
@@ -242,8 +242,16 @@ ${darkVars}
         <h2 className="text-2xl font-bold">Color Palette</h2>
         <AddVariableDialog onAddVariable={handleAddVariable} />
       </div>
-      <ColorPalette tokens={tokens} onColorChange={handleColorChange} />
-      <CodePreviews tokens={tokens} />
+      {tokens.length > 0 ? (
+        <>
+          <ColorPalette tokens={tokens} onColorChange={handleColorChange} />
+          <CodePreviews tokens={tokens} />
+        </>
+      ) : (
+        <div className="flex items-center justify-center py-16">
+          <p>No color tokens found. Add one to get started!</p>
+        </div>
+      )}
     </div>
   );
 }
