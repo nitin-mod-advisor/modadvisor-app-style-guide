@@ -46,9 +46,9 @@ function ComponentsSubMenu() {
             <CollapsibleContent>
                 <SidebarMenuSub>
                     <SidebarMenuSubItem>
-                        <Link href="/components" legacyBehavior passHref>
-                            <SidebarMenuSubButton isActive={pathname === '/components'} asChild>
-                                <a>All Components</a>
+                         <Link href="/components" passHref>
+                            <SidebarMenuSubButton isActive={pathname === '/components'}>
+                                All Components
                             </SidebarMenuSubButton>
                         </Link>
                     </SidebarMenuSubItem>
