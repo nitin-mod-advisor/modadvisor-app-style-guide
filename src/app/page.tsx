@@ -52,14 +52,9 @@ export default function Home() {
   }
 
   return (
-    <div className="grid lg:grid-cols-5 h-screen">
-      <div className="lg:col-span-2 p-4 sm:p-6 lg:p-8 lg:h-screen lg:overflow-y-auto space-y-8">
-        <ColorPalette tokens={tokens} onColorChange={handleColorChange} />
-        <CodePreviews tokens={tokens} />
-      </div>
-      <div className="lg:col-span-3 bg-surface-2 p-4 sm:p-6 lg:p-8 lg:h-screen lg:overflow-y-auto">
-        <ComponentPreviews />
-      </div>
+    <div className="p-4 sm:p-6 lg:p-8 lg:h-screen lg:overflow-y-auto space-y-8">
+      <ColorPalette tokens={tokens} onColorChange={handleColorChange} />
+      <CodePreviews tokens={tokens} />
     </div>
   );
 }
