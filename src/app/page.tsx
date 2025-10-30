@@ -149,25 +149,25 @@ export default function Home() {
     setIsClient(true);
   }, []);
 
-  // Effect to synchronize Firestore data to local state
+  // Effect to synchronize Firestore data to local state AND bootstrap if necessary.
   useEffect(() => {
+    // If data comes back from Firestore, update the local state.
     if (paletteData) {
       setTokens(paletteData.tokens);
-    }
-  }, [paletteData]);
-
-  // Effect for bootstrapping the initial palette in Firestore
-  useEffect(() => {
-    // This effect runs when loading is finished.
-    // If there's no data, it means the document doesn't exist, so we create it ONCE.
-    if (!isPaletteLoading && !paletteData && paletteRef) {
+    } 
+    // This is the critical check:
+    // If the hook is done loading AND there is still no data, it means the document
+    // does not exist. This is the ONLY time we should create it.
+    else if (!isPaletteLoading && !paletteData && paletteRef) {
       const initialPalette: ColorPaletteType = {
         id: PALETTE_ID,
         tokens: INITIAL_TOKENS,
       };
+      // We set the local state AND save to Firestore so the UI is in sync.
+      setTokens(initialPalette.tokens);
       setDocumentNonBlocking(paletteRef, initialPalette, { merge: false });
     }
-  }, [isPaletteLoading, paletteData, paletteRef]);
+  }, [paletteData, isPaletteLoading, paletteRef]);
   
   // Effect to dynamically update CSS variables in the document head
   useEffect(() => {
@@ -255,3 +255,5 @@ ${darkVars}
     </div>
   );
 }
+
+    
