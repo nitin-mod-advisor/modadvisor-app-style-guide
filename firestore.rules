@@ -1,45 +1,30 @@
 /**
- * @file Firestore Security Rules
- * @description This ruleset governs access to the `/color_palettes` collection, enabling authenticated users to read and write color palette documents.
+ * @file Firestore Security Rules for Color Palettes.
  *
  * Core Philosophy:
- * This ruleset allows any authenticated user to read and write color palettes. There is no ownership concept.
+ * This ruleset allows public read access to color palettes and restricts write access. There is currently no concept of user-specific color palettes, ownership, or roles.
  *
  * Data Structure:
- * All color palettes are stored in the `/color_palettes/{colorPaletteId}` collection.
+ * All color palettes are stored in the top-level `/color_palettes/{colorPaletteId}` collection.
  *
  * Key Security Decisions:
- * - Authenticated users can read any color palette.
- * - Authenticated users can create, update, and delete any color palette.
+ * - Color palettes are publicly readable.
+ * - Write operations (create, update, delete) are disallowed for all users.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls read and write access to individual color palettes.
+     * @description Controls access to individual color palettes.
      * @path /color_palettes/{colorPaletteId}
-     * @allow (get) - Any authenticated user can read a color palette.
-     * @allow (list) - Any authenticated user can list color palettes.
-     * @allow (create) - Any authenticated user can create a color palette.
-     * @allow (update) - Any authenticated user can update a color palette.
-     * @allow (delete) - Any authenticated user can delete a color palette.
-     * @deny (create) - Not authenticated user can create a color palette.
-     * @deny (update) - Not authenticated user can update a color palette.
-     * @deny (delete) - Not authenticated user can delete a color palette.
-     * @principle Allows authenticated users to read and write color palettes.
+     * @allow (get, list): Any user can read any color palette.
+     * @deny (create, update, delete): No user can create, update, or delete color palettes.
+     * @principle Allows public read access but forbids write access.
      */
     match /color_palettes/{colorPaletteId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update: if isSignedIn();
-      allow delete: if isSignedIn();
-    }
-
-    // Helper function to check if a user is signed in
-    function isSignedIn() {
-      return request.auth != null;
+      allow get, list: if true;
+      allow create, update, delete: if false;
     }
   }
 }

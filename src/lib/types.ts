@@ -4,3 +4,8 @@ export type ColorToken = {
   light: string;
   dark: string;
 };
+
+export type ColorPalette = {
+  id: string;
+  tokens: ColorToken[];
+};
