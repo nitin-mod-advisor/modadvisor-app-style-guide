@@ -1,0 +1,131 @@
+{
+  "entities": {
+    "ColorPalette": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ColorPalette",
+      "type": "object",
+      "description": "Represents a color palette with light and dark theme colors.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the color palette."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the color palette (e.g., 'Default', 'Cool Blue')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the color palette."
+        },
+        "colors": {
+          "type": "array",
+          "description": "An array of color objects, each representing a specific color token.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "colors"
+      ]
+    },
+    "Color": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Color",
+      "type": "object",
+      "description": "Represents a single color token with light and dark mode values.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the color."
+        },
+        "colorPaletteId": {
+          "type": "string",
+          "description": "Reference to ColorPalette. (Relationship: ColorPalette 1:N Color)"
+        },
+        "token": {
+          "type": "string",
+          "description": "The semantic token name (e.g., '--bg', '--primary')."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the color (e.g., 'Page background', 'Brand color')."
+        },
+        "light": {
+          "type": "string",
+          "description": "The color value for light mode (e.g., '#F8FAFC')."
+        },
+        "dark": {
+          "type": "string",
+          "description": "The color value for dark mode (e.g., '#0B1220')."
+        }
+      },
+      "required": [
+        "id",
+        "colorPaletteId",
+        "token",
+        "role",
+        "light",
+        "dark"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}/colorPalettes/{colorPaletteId}",
+        "definition": {
+          "entityName": "ColorPalette",
+          "schema": {
+            "$ref": "#/backend/entities/ColorPalette"
+          },
+          "description": "Stores color palettes owned by a specific user. Path-based ownership is enforced, and authorization is based on request.auth.uid. Authorization independence is achieved as all authorization information is contained in the path.  This structure ensures secure `list` operations and proper ownership invariants.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns the color palette."
+            },
+            {
+              "name": "colorPaletteId",
+              "description": "The unique identifier of the color palette."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/colorPalettes/{colorPaletteId}/colors/{colorId}",
+        "definition": {
+          "entityName": "Color",
+          "schema": {
+            "$ref": "#/backend/entities/Color"
+          },
+          "description": "Stores individual color tokens within a color palette owned by a specific user. Path-based ownership is enforced, and authorization is based on request.auth.uid. Authorization independence is achieved as all authorization information is contained in the path.  This structure ensures secure `list` operations and proper ownership invariants.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns the color palette."
+            },
+            {
+              "name": "colorPaletteId",
+              "description": "The unique identifier of the color palette."
+            },
+            {
+              "name": "colorId",
+              "description": "The unique identifier of the color."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to store and manage color palettes for a live style guide editor application. It features a top-level collection for color palettes and a subcollection for individual colors within each palette. This structure allows for easy fetching and updating of color codes, with real-time updates to the UI.  Authorization independence is achieved by storing the user ID as the document ID in the `/users/{userId}/colorPalettes/{colorPaletteId}` path.  This eliminates the need for `get()` calls in security rules. Furthermore, authorization is based solely on `request.auth.uid` and path-based ownership. QAPs are supported through structural segregation and path-based ownership. Each user has their own collection of color palettes, ensuring that list operations are secure and only return palettes owned by the requesting user."
+  }
+}
