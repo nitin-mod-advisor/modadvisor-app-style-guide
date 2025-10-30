@@ -209,7 +209,7 @@ const DynamicPreviewContainer = ({ title, children, code, controls }: { title: s
             <div className="space-y-4">
                 <h4 className="font-medium text-lg text-muted-foreground">How to use</h4>
                 <div className="relative group">
-                     <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover-opacity-100 transition-opacity" onClick={copyToClipboard} aria-label="Copy code">
+                     <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={copyToClipboard} aria-label="Copy code">
                         <Clipboard className="h-4 w-4" />
                     </Button>
                     <pre className="bg-muted border border-border rounded-lg p-4 text-xs font-mono overflow-x-auto">
@@ -225,8 +225,9 @@ const DynamicPreviewContainer = ({ title, children, code, controls }: { title: s
 const AccordionPreview = () => {
     const [type, setType] = useState<'single' | 'multiple'>('single');
     const [collapsible, setCollapsible] = useState(true);
+    const [className, setClassName] = useState('');
 
-    const code = `<Accordion type="${type}" ${collapsible && type === 'single' ? 'collapsible' : ''} className="w-full">
+    const code = `<Accordion type="${type}" ${collapsible && type === 'single' ? 'collapsible' : ''} className={cn("w-full", "${className}")}>
     <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
         <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
@@ -259,10 +260,19 @@ const AccordionPreview = () => {
                         <Switch id="collapsible-switch" checked={collapsible} onCheckedChange={setCollapsible} disabled={type === 'multiple'} />
                         <Label htmlFor="collapsible-switch">Collapsible</Label>
                     </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="accordion-classname">ClassName</Label>
+                        <Input 
+                            id="accordion-classname"
+                            placeholder="e.g. bg-blue-500"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
-            <Accordion type={type} collapsible={type === 'single' ? collapsible : undefined} className="w-full max-w-md">
+            <Accordion type={type} collapsible={type === 'single' ? collapsible : undefined} className={cn("w-full max-w-md", className)}>
                 <AccordionItem value="item-1">
                     <AccordionTrigger>Is it accessible?</AccordionTrigger>
                     <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
@@ -280,8 +290,9 @@ const AlertPreview = () => {
     const [variant, setVariant] = useState<'default' | 'destructive'>('default');
     const [title, setTitle] = useState('Heads up!');
     const [description, setDescription] = useState('This is an informational message.');
+    const [className, setClassName] = useState('');
 
-    const code = `<Alert variant="${variant}">
+    const code = `<Alert variant="${variant}" className={cn("${className}")}>
     <${variant === 'destructive' ? 'XCircle' : 'Info'} className="h-4 w-4" />
     <AlertTitle>${title}</AlertTitle>
     <AlertDescription>${description}</AlertDescription>
@@ -313,11 +324,20 @@ const AlertPreview = () => {
                         <Label htmlFor="alert-description">Description</Label>
                         <Input id="alert-description" value={description} onChange={(e) => setDescription(e.target.value)} />
                     </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="alert-classname">ClassName</Label>
+                        <Input 
+                            id="alert-classname"
+                            placeholder="e.g. border-blue-500"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
             <div className="w-full max-w-md space-y-4">
-                <Alert variant={variant}>
+                <Alert variant={variant} className={cn(className)}>
                     {variant === 'destructive' ? <XCircle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
                     <AlertTitle>{title}</AlertTitle>
                     <AlertDescription>{description}</AlertDescription>
@@ -375,8 +395,9 @@ const AlertDialogPreview = () => (
 const AvatarPreview = () => {
     const [seed, setSeed] = useState('avatar');
     const [fallback, setFallback] = useState('CN');
+    const [className, setClassName] = useState('');
 
-    const code = `<Avatar>
+    const code = `<Avatar className={cn("${className}")}>
     <AvatarImage src="https://picsum.photos/seed/${seed}/100/100" alt="@shadcn" />
     <AvatarFallback>${fallback}</AvatarFallback>
 </Avatar>`;
@@ -395,10 +416,19 @@ const AvatarPreview = () => {
                         <Label htmlFor="avatar-fallback">Fallback Text</Label>
                         <Input id="avatar-fallback" value={fallback} onChange={(e) => setFallback(e.target.value)} />
                     </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="avatar-classname">ClassName</Label>
+                        <Input 
+                            id="avatar-classname"
+                            placeholder="e.g. w-20 h-20"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
-            <Avatar>
+            <Avatar className={cn(className)}>
                 <AvatarImage src={`https://picsum.photos/seed/${seed}/100/100`} alt="@shadcn" />
                 <AvatarFallback>{fallback}</AvatarFallback>
             </Avatar>
@@ -409,8 +439,9 @@ const AvatarPreview = () => {
 const BadgePreview = () => {
     const [variant, setVariant] = useState<'default' | 'secondary' | 'destructive' | 'outline'>('default');
     const [text, setText] = useState('Badge');
+    const [className, setClassName] = useState('');
     
-    const code = `<Badge variant="${variant}">${text}</Badge>`;
+    const code = `<Badge variant="${variant}" className={cn("${className}")}>${text}</Badge>`;
 
     return (
         <DynamicPreviewContainer 
@@ -436,10 +467,19 @@ const BadgePreview = () => {
                         <Label htmlFor="badge-text">Text</Label>
                         <Input id="badge-text" value={text} onChange={(e) => setText(e.target.value)} />
                     </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="badge-classname">ClassName</Label>
+                        <Input 
+                            id="badge-classname"
+                            placeholder="e.g. text-lg"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
-            <Badge variant={variant}>{text}</Badge>
+            <Badge variant={variant} className={cn(className)}>{text}</Badge>
         </DynamicPreviewContainer>
     );
 }
@@ -450,7 +490,7 @@ const ButtonPreview = () => {
     const [size, setSize] = useState<'default' | 'sm' | 'lg' | 'icon'>('default');
     const [text, setText] = useState('Dynamic Button');
 
-    const code = `<Button variant="${variant}" size="${size}" className="${className}">\n  ${text}\n</Button>`;
+    const code = `<Button variant="${variant}" size="${size}" className={cn("${className}")}>\n  ${text}\n</Button>`;
 
     return (
         <DynamicPreviewContainer
@@ -690,9 +730,10 @@ const CheckboxPreview = () => {
     const [checked, setChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const [labelText, setLabelText] = useState('Accept terms and conditions');
+    const [className, setClassName] = useState('');
 
     const code = `<div className="flex items-center space-x-2">
-    <Checkbox id="terms" checked={${checked}}${disabled ? ' disabled' : ''} />
+    <Checkbox id="terms" checked={${checked}}${disabled ? ' disabled' : ''} className={cn("${className}")} />
     <label
         htmlFor="terms"
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -719,11 +760,20 @@ const CheckboxPreview = () => {
                         <Switch id="disabled-switch" checked={disabled} onCheckedChange={setDisabled} />
                         <Label htmlFor="disabled-switch">Disabled</Label>
                     </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="checkbox-classname">ClassName</Label>
+                        <Input 
+                            id="checkbox-classname"
+                            placeholder="e.g. h-6 w-6"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
             <div className="flex items-center space-x-2">
-                <Checkbox id="terms" checked={checked} onCheckedChange={setChecked} disabled={disabled} />
+                <Checkbox id="terms" checked={checked} onCheckedChange={setChecked} disabled={disabled} className={cn(className)} />
                 <label
                     htmlFor="terms"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -940,6 +990,7 @@ const formSchema = z.object({
 })
 
 const FormPreview = () => {
+    const { toast } = useToast()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -1026,8 +1077,9 @@ const InputPreview = () => {
     const [placeholder, setPlaceholder] = useState('Enter text...');
     const [disabled, setDisabled] = useState(false);
     const [type, setType] = useState('text');
+    const [className, setClassName] = useState('');
 
-    const code = `<Input type="${type}" placeholder="${placeholder}" ${disabled ? 'disabled ' : ''}/>`;
+    const code = `<Input type="${type}" placeholder="${placeholder}" ${disabled ? 'disabled ' : ''} className={cn("${className}")} />`;
 
     return (
         <DynamicPreviewContainer 
@@ -1058,11 +1110,20 @@ const InputPreview = () => {
                         <Switch id="input-disabled-switch" checked={disabled} onCheckedChange={setDisabled} />
                         <Label htmlFor="input-disabled-switch">Disabled</Label>
                     </div>
+                     <div className='space-y-2'>
+                        <Label htmlFor="input-classname">ClassName</Label>
+                        <Input 
+                            id="input-classname"
+                            placeholder="e.g. border-blue-500"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
             <div className="w-full max-w-sm">
-                <Input type={type} placeholder={placeholder} disabled={disabled} />
+                <Input type={type} placeholder={placeholder} disabled={disabled} className={cn(className)} />
             </div>
         </DynamicPreviewContainer>
     );
@@ -1157,21 +1218,33 @@ const PopoverPreview = () => (
 
 const ProgressPreview = () => {
     const [progress, setProgress] = React.useState(66)
+    const [className, setClassName] = useState('');
     
-    const code = `<Progress value={${progress}} className="w-[60%]" />`;
+    const code = `<Progress value={${progress}} className={cn("w-[60%]", "${className}")} />`;
     
     return (
          <DynamicPreviewContainer 
             title="Progress"
             code={code}
             controls={
-                <div className='space-y-2'>
-                    <Label htmlFor="progress-value">Progress ({progress}%)</Label>
-                    <Slider id="progress-value" defaultValue={[progress]} max={100} step={1} onValueChange={(v) => setProgress(v[0])} />
-                </div>
+                <>
+                    <div className='space-y-2'>
+                        <Label htmlFor="progress-value">Progress ({progress}%)</Label>
+                        <Slider id="progress-value" defaultValue={[progress]} max={100} step={1} onValueChange={(v) => setProgress(v[0])} />
+                    </div>
+                     <div className='space-y-2'>
+                        <Label htmlFor="progress-classname">ClassName</Label>
+                        <Input 
+                            id="progress-classname"
+                            placeholder="e.g. h-2"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
+                </>
             }
         >
-            <Progress value={progress} className="w-[60%]" />
+            <Progress value={progress} className={cn("w-[60%]", className)} />
         </DynamicPreviewContainer>
     )
 };
@@ -1271,6 +1344,7 @@ const SelectPreview = () => (
 
 const SeparatorPreview = () => {
     const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('horizontal');
+    const [className, setClassName] = useState('');
 
     const code = orientation === 'horizontal' ? `
 <div className="w-full max-w-sm">
@@ -1278,14 +1352,14 @@ const SeparatorPreview = () => {
         <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
         <p className="text-sm text-muted-foreground">An open-source UI component library.</p>
     </div>
-    <Separator className="my-4" />
+    <Separator className={cn("my-4", "${className}")} />
     ...
 </div>` : `
 <div className="flex h-5 items-center space-x-4 text-sm">
     <div>Blog</div>
-    <Separator orientation="vertical" />
+    <Separator orientation="vertical" className={cn("${className}")} />
     <div>Docs</div>
-    <Separator orientation="vertical" />
+    <Separator orientation="vertical" className={cn("${className}")} />
     <div>Source</div>
 </div>`;
 
@@ -1294,18 +1368,29 @@ const SeparatorPreview = () => {
             title="Separator"
             code={code}
             controls={
-                <div className='space-y-2'>
-                    <Label>Orientation</Label>
-                    <Select onValueChange={(v: any) => setOrientation(v)} defaultValue={orientation}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select orientation" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="horizontal">Horizontal</SelectItem>
-                            <SelectItem value="vertical">Vertical</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+                 <>
+                    <div className='space-y-2'>
+                        <Label>Orientation</Label>
+                        <Select onValueChange={(v: any) => setOrientation(v)} defaultValue={orientation}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select orientation" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="horizontal">Horizontal</SelectItem>
+                                <SelectItem value="vertical">Vertical</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="separator-classname">ClassName</Label>
+                        <Input 
+                            id="separator-classname"
+                            placeholder="e.g. bg-primary"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
+                </>
             }
         >
             <div className="w-full max-w-sm">
@@ -1315,21 +1400,21 @@ const SeparatorPreview = () => {
                             <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
                             <p className="text-sm text-muted-foreground">An open-source UI component library.</p>
                         </div>
-                        <Separator className="my-4" />
+                        <Separator className={cn("my-4", className)} />
                         <div className="flex h-5 items-center space-x-4 text-sm">
                             <div>Blog</div>
-                            <Separator orientation="vertical" />
+                            <Separator orientation="vertical" className={cn(className)} />
                             <div>Docs</div>
-                            <Separator orientation="vertical" />
+                            <Separator orientation="vertical" className={cn(className)} />
                             <div>Source</div>
                         </div>
                     </>
                 ) : (
                     <div className="flex h-5 items-center space-x-4 text-sm">
                         <div>Blog</div>
-                        <Separator orientation="vertical" />
+                        <Separator orientation="vertical" className={cn(className)} />
                         <div>Docs</div>
-                        <Separator orientation="vertical" />
+                        <Separator orientation="vertical" className={cn(className)} />
                         <div>Source</div>
                     </div>
                 )}
@@ -1415,8 +1500,9 @@ const SkeletonPreview = () => (
 const SliderPreview = () => {
     const [value, setValue] = useState(50);
     const [step, setStep] = useState(1);
+    const [className, setClassName] = useState('');
 
-    const code = `<Slider defaultValue={[${value}]} max={100} step={${step}} className="w-[60%]" />`;
+    const code = `<Slider defaultValue={[${value}]} max={100} step={${step}} className={cn("w-[60%]", "${className}")} />`;
 
     return (
         <DynamicPreviewContainer 
@@ -1432,10 +1518,19 @@ const SliderPreview = () => {
                         <Label htmlFor="slider-step">Step</Label>
                         <Input id="slider-step" type="number" value={step} onChange={(e) => setStep(Number(e.target.value) || 1)} />
                     </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="slider-classname">ClassName</Label>
+                        <Input 
+                            id="slider-classname"
+                            placeholder="e.g. [&>span:first-child]:bg-red-500"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
-            <Slider defaultValue={[value]} max={100} step={step} onValueChange={(v) => setValue(v[0])} className="w-[60%]" />
+            <Slider defaultValue={[value]} max={100} step={step} onValueChange={(v) => setValue(v[0])} className={cn("w-[60%]", className)} />
         </DynamicPreviewContainer>
     );
 };
@@ -1443,9 +1538,10 @@ const SliderPreview = () => {
 const SwitchPreview = () => {
     const [checked, setChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
+    const [className, setClassName] = useState('');
 
     const code = `<div className="flex items-center space-x-2">
-    <Switch id="airplane-mode" checked={${checked}}${disabled ? ' disabled' : ''} />
+    <Switch id="airplane-mode" checked={${checked}}${disabled ? ' disabled' : ''} className={cn("${className}")} />
     <Label htmlFor="airplane-mode">Airplane Mode</Label>
 </div>`;
 
@@ -1463,11 +1559,20 @@ const SwitchPreview = () => {
                         <Switch id="switch-disabled-switch" checked={disabled} onCheckedChange={setDisabled} />
                         <Label htmlFor="switch-disabled-switch">Disabled</Label>
                     </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="switch-classname">ClassName</Label>
+                        <Input 
+                            id="switch-classname"
+                            placeholder="e.g. data-[state=checked]:bg-green-500"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
             <div className="flex items-center space-x-2">
-                <Switch id="airplane-mode" checked={checked} onCheckedChange={setChecked} disabled={disabled}/>
+                <Switch id="airplane-mode" checked={checked} onCheckedChange={(c) => setChecked(c)} disabled={disabled} className={cn(className)} />
                 <Label htmlFor="airplane-mode">Airplane Mode</Label>
             </div>
         </DynamicPreviewContainer>
@@ -1615,8 +1720,9 @@ const TabsPreview = () => (
 const TextareaPreview = () => {
     const [placeholder, setPlaceholder] = useState('Type your message here.');
     const [disabled, setDisabled] = useState(false);
+    const [className, setClassName] = useState('');
 
-    const code = `<Textarea placeholder="${placeholder}" ${disabled ? 'disabled ' : ''}className="max-w-sm"/>`;
+    const code = `<Textarea placeholder="${placeholder}" ${disabled ? 'disabled ' : ''}className={cn("max-w-sm", "${className}")}/>`;
     
     return (
         <DynamicPreviewContainer 
@@ -1632,10 +1738,19 @@ const TextareaPreview = () => {
                         <Switch id="textarea-disabled-switch" checked={disabled} onCheckedChange={setDisabled} />
                         <Label htmlFor="textarea-disabled-switch">Disabled</Label>
                     </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="textarea-classname">ClassName</Label>
+                        <Input 
+                            id="textarea-classname"
+                            placeholder="e.g. resize-none"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
                 </>
             }
         >
-            <Textarea placeholder={placeholder} disabled={disabled} className="max-w-sm"/>
+            <Textarea placeholder={placeholder} disabled={disabled} className={cn("max-w-sm", className)}/>
         </DynamicPreviewContainer>
     );
 };
@@ -1754,6 +1869,8 @@ const SidebarHeaderPreview = () => (
         </div>
     </PreviewContainer>
 );
+    
+
     
 
     
