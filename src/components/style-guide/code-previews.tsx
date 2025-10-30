@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import type { ColorToken } from '@/lib/style-guide-data';
+import type { ColorToken } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Clipboard, Download } from 'lucide-react';

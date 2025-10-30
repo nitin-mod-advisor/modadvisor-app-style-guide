@@ -3,7 +3,6 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from "@/components/ui/toaster";
 import LiveStyleGuide from '@/components/style-guide/live-style-guide';
-import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'Live Style Guide Editor',
@@ -23,18 +22,16 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <FirebaseClientProvider>
-          <ThemeProvider
-            attribute="data-theme"
-            defaultTheme="light"
-            enableSystem={false}
-          >
-            <LiveStyleGuide>
-              {children}
-            </LiveStyleGuide>
-            <Toaster />
-          </ThemeProvider>
-        </FirebaseClientProvider>
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme="light"
+          enableSystem={false}
+        >
+          <LiveStyleGuide>
+            {children}
+          </LiveStyleGuide>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
