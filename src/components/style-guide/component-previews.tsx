@@ -178,11 +178,55 @@ const PreviewContainer = ({ title, children, code }: { title: string, children: 
     );
 };
 
-const AccordionPreview = () => (
-    <PreviewContainer 
-        title="Accordion"
-        code={`
-<Accordion type="single" collapsible className="w-full">
+
+const DynamicPreviewContainer = ({ title, children, code, controls }: { title: string, children: React.ReactNode, code: string, controls: React.ReactNode }) => {
+    const { toast } = useToast();
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(code).then(() => {
+        toast({
+            title: "Copied to clipboard!",
+            description: `${title} code has been copied.`,
+        });
+        });
+    };
+
+    return (
+        <div className="space-y-6 mt-8">
+            <h3 className="font-semibold text-xl text-foreground">{title}</h3>
+            <div className="space-y-4">
+                <h4 className="font-medium text-lg text-muted-foreground">Preview</h4>
+                <div className="p-6 bg-card rounded-lg border border-border flex flex-wrap gap-4 items-center justify-center">
+                    {children}
+                </div>
+            </div>
+            <div className="space-y-4">
+                <h4 className="font-medium text-lg text-muted-foreground">Controls</h4>
+                <div className="p-6 bg-card rounded-lg border border-border grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {controls}
+                </div>
+            </div>
+            <div className="space-y-4">
+                <h4 className="font-medium text-lg text-muted-foreground">How to use</h4>
+                <div className="relative group">
+                     <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover-opacity-100 transition-opacity" onClick={copyToClipboard} aria-label="Copy code">
+                        <Clipboard className="h-4 w-4" />
+                    </Button>
+                    <pre className="bg-muted border border-border rounded-lg p-4 text-xs font-mono overflow-x-auto">
+                        <code>{code}</code>
+                    </pre>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+const AccordionPreview = () => {
+    const [type, setType] = useState<'single' | 'multiple'>('single');
+    const [collapsible, setCollapsible] = useState(true);
+
+    const code = `<Accordion type="${type}" ${collapsible && type === 'single' ? 'collapsible' : ''} className="w-full">
     <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
         <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
@@ -191,54 +235,97 @@ const AccordionPreview = () => (
         <AccordionTrigger>Is it styled?</AccordionTrigger>
         <AccordionContent>Yes. It comes with default styles that matches the other components' aesthetics.</AccordionContent>
     </AccordionItem>
-</Accordion>
-        `}
-    >
-        <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-                <AccordionTrigger>Is it accessible?</AccordionTrigger>
-                <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
-                <AccordionTrigger>Is it styled?</AccordionTrigger>
-                <AccordionContent>Yes. It comes with default styles that matches the other components' aesthetics.</AccordionContent>
-            </AccordionItem>
-        </Accordion>
-    </PreviewContainer>
-);
+</Accordion>`;
 
-const AlertPreview = () => (
-    <PreviewContainer 
-        title="Alerts"
-        code={`
-<div className="w-full space-y-4">
-    <Alert>
-        <Info className="h-4 w-4" />
-        <AlertTitle>Heads up!</AlertTitle>
-        <AlertDescription>This is an informational message.</AlertDescription>
-    </Alert>
-    <Alert variant="destructive">
-        <XCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>This is an error message.</AlertDescription>
-    </Alert>
-</div>
-        `}
-    >
-         <div className="w-full space-y-4">
-            <Alert>
-                <Info className="h-4 w-4" />
-                <AlertTitle>Heads up!</AlertTitle>
-                <AlertDescription>This is an informational message.</AlertDescription>
-            </Alert>
-            <Alert variant="destructive">
-                <XCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>This is an error message.</AlertDescription>
-            </Alert>
-        </div>
-    </PreviewContainer>
-);
+    return (
+        <DynamicPreviewContainer
+            title="Accordion"
+            code={code}
+            controls={
+                <>
+                    <div className="space-y-2">
+                        <Label>Type</Label>
+                        <Select onValueChange={(v: any) => setType(v)} defaultValue={type}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="single">Single</SelectItem>
+                                <SelectItem value="multiple">Multiple</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Switch id="collapsible-switch" checked={collapsible} onCheckedChange={setCollapsible} disabled={type === 'multiple'} />
+                        <Label htmlFor="collapsible-switch">Collapsible</Label>
+                    </div>
+                </>
+            }
+        >
+            <Accordion type={type} collapsible={type === 'single' ? collapsible : undefined} className="w-full max-w-md">
+                <AccordionItem value="item-1">
+                    <AccordionTrigger>Is it accessible?</AccordionTrigger>
+                    <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                    <AccordionTrigger>Is it styled?</AccordionTrigger>
+                    <AccordionContent>Yes. It comes with default styles that matches the other components' aesthetics.</AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </DynamicPreviewContainer>
+    );
+}
+
+const AlertPreview = () => {
+    const [variant, setVariant] = useState<'default' | 'destructive'>('default');
+    const [title, setTitle] = useState('Heads up!');
+    const [description, setDescription] = useState('This is an informational message.');
+
+    const code = `<Alert variant="${variant}">
+    <${variant === 'destructive' ? 'XCircle' : 'Info'} className="h-4 w-4" />
+    <AlertTitle>${title}</AlertTitle>
+    <AlertDescription>${description}</AlertDescription>
+</Alert>`;
+
+    return (
+        <DynamicPreviewContainer 
+            title="Alerts"
+            code={code}
+            controls={
+                <>
+                    <div className="space-y-2">
+                        <Label>Variant</Label>
+                        <Select onValueChange={(v: any) => setVariant(v)} defaultValue={variant}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select variant" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="default">Default</SelectItem>
+                                <SelectItem value="destructive">Destructive</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="alert-title">Title</Label>
+                        <Input id="alert-title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="alert-description">Description</Label>
+                        <Input id="alert-description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                    </div>
+                </>
+            }
+        >
+            <div className="w-full max-w-md space-y-4">
+                <Alert variant={variant}>
+                    {variant === 'destructive' ? <XCircle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
+                    <AlertTitle>{title}</AlertTitle>
+                    <AlertDescription>{description}</AlertDescription>
+                </Alert>
+            </div>
+        </DynamicPreviewContainer>
+    );
+};
 
 const AlertDialogPreview = () => (
     <PreviewContainer 
@@ -285,60 +372,92 @@ const AlertDialogPreview = () => (
     </PreviewContainer>
 );
 
-const AvatarPreview = () => (
-    <PreviewContainer 
-        title="Avatar"
-        code={`
-<Avatar>
-    <AvatarImage src="https://picsum.photos/seed/avatar/100/100" alt="@shadcn" />
-    <AvatarFallback>CN</AvatarFallback>
-</Avatar>
-        `}
-    >
-        <Avatar>
-            <AvatarImage src="https://picsum.photos/seed/avatar/100/100" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-    </PreviewContainer>
-);
+const AvatarPreview = () => {
+    const [seed, setSeed] = useState('avatar');
+    const [fallback, setFallback] = useState('CN');
 
-const BadgePreview = () => (
-    <PreviewContainer 
-        title="Badge"
-        code={`
-<Badge>Default</Badge>
-<Badge variant="secondary">Secondary</Badge>
-<Badge variant="destructive">Destructive</Badge>
-<Badge variant="outline">Outline</Badge>
-        `}
-    >
-        <Badge>Default</Badge>
-        <Badge variant="secondary">Secondary</Badge>
-        <Badge variant="destructive">Destructive</Badge>
-        <Badge variant="outline">Outline</Badge>
-    </PreviewContainer>
-);
+    const code = `<Avatar>
+    <AvatarImage src="https://picsum.photos/seed/${seed}/100/100" alt="@shadcn" />
+    <AvatarFallback>${fallback}</AvatarFallback>
+</Avatar>`;
+
+    return (
+        <DynamicPreviewContainer 
+            title="Avatar"
+            code={code}
+            controls={
+                <>
+                    <div className='space-y-2'>
+                        <Label htmlFor="avatar-seed">Image Seed</Label>
+                        <Input id="avatar-seed" value={seed} onChange={(e) => setSeed(e.target.value)} />
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="avatar-fallback">Fallback Text</Label>
+                        <Input id="avatar-fallback" value={fallback} onChange={(e) => setFallback(e.target.value)} />
+                    </div>
+                </>
+            }
+        >
+            <Avatar>
+                <AvatarImage src={`https://picsum.photos/seed/${seed}/100/100`} alt="@shadcn" />
+                <AvatarFallback>{fallback}</AvatarFallback>
+            </Avatar>
+        </DynamicPreviewContainer>
+    );
+}
+
+const BadgePreview = () => {
+    const [variant, setVariant] = useState<'default' | 'secondary' | 'destructive' | 'outline'>('default');
+    const [text, setText] = useState('Badge');
+    
+    const code = `<Badge variant="${variant}">${text}</Badge>`;
+
+    return (
+        <DynamicPreviewContainer 
+            title="Badge"
+            code={code}
+            controls={
+                <>
+                    <div className="space-y-2">
+                        <Label>Variant</Label>
+                        <Select onValueChange={(v: any) => setVariant(v)} defaultValue={variant}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select variant" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="default">Default</SelectItem>
+                                <SelectItem value="secondary">Secondary</SelectItem>
+                                <SelectItem value="destructive">Destructive</SelectItem>
+                                <SelectItem value="outline">Outline</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="badge-text">Text</Label>
+                        <Input id="badge-text" value={text} onChange={(e) => setText(e.target.value)} />
+                    </div>
+                </>
+            }
+        >
+            <Badge variant={variant}>{text}</Badge>
+        </DynamicPreviewContainer>
+    );
+}
 
 const ButtonPreview = () => {
     const [variant, setVariant] = useState<'default' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link'>('default');
     const [className, setClassName] = useState('');
+    const [size, setSize] = useState<'default' | 'sm' | 'lg' | 'icon'>('default');
+    const [text, setText] = useState('Dynamic Button');
 
-    const code = `<Button variant="${variant}" className="${className}">\n  Dynamic Button\n</Button>`;
+    const code = `<Button variant="${variant}" size="${size}" className="${className}">\n  ${text}\n</Button>`;
 
     return (
-        <div className="space-y-6 mt-8">
-            <h3 className="font-semibold text-xl text-foreground">Buttons</h3>
-            <div className="space-y-4">
-                <h4 className="font-medium text-lg text-muted-foreground">Preview</h4>
-                <div className="p-6 bg-card rounded-lg border border-border flex flex-wrap gap-4 items-center justify-center">
-                    <Button variant={variant} className={cn(className)}>
-                        Dynamic Button
-                    </Button>
-                </div>
-            </div>
-             <div className="space-y-4">
-                <h4 className="font-medium text-lg text-muted-foreground">Controls</h4>
-                <div className="p-6 bg-card rounded-lg border border-border grid grid-cols-1 md:grid-cols-2 gap-4">
+        <DynamicPreviewContainer
+            title="Buttons"
+            code={code}
+            controls={
+                <>
                     <div className='space-y-2'>
                         <Label>Variant</Label>
                         <Select onValueChange={(v: any) => setVariant(v)} defaultValue={variant}>
@@ -356,6 +475,24 @@ const ButtonPreview = () => {
                         </Select>
                     </div>
                      <div className='space-y-2'>
+                        <Label>Size</Label>
+                        <Select onValueChange={(v: any) => setSize(v)} defaultValue={size}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="default">Default</SelectItem>
+                                <SelectItem value="sm">Small</SelectItem>
+                                <SelectItem value="lg">Large</SelectItem>
+                                <SelectItem value="icon">Icon</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="button-text">Text</Label>
+                        <Input id="button-text" value={text} onChange={(e) => setText(e.target.value)} />
+                    </div>
+                     <div className='space-y-2'>
                         <Label htmlFor="button-classname">ClassName</Label>
                         <Input 
                             id="button-classname"
@@ -364,20 +501,13 @@ const ButtonPreview = () => {
                             onChange={(e) => setClassName(e.target.value)}
                         />
                     </div>
-                </div>
-            </div>
-            <div className="space-y-4">
-                <h4 className="font-medium text-lg text-muted-foreground">How to use</h4>
-                <div className="relative group">
-                     <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => navigator.clipboard.writeText(code)} aria-label="Copy code">
-                        <Clipboard className="h-4 w-4" />
-                    </Button>
-                    <pre className="bg-muted border border-border rounded-lg p-4 text-xs font-mono overflow-x-auto">
-                        <code>{code}</code>
-                    </pre>
-                </div>
-            </div>
-        </div>
+                </>
+            }
+        >
+            <Button variant={variant} size={size} className={cn(className)}>
+                {size === 'icon' ? <Plus/> : text}
+            </Button>
+        </DynamicPreviewContainer>
     )
 }
 
@@ -556,32 +686,54 @@ const chartConfig = {
     </PreviewContainer>
 );
 
-const CheckboxPreview = () => (
-    <PreviewContainer 
-        title="Checkbox"
-        code={`
-<div className="flex items-center space-x-2">
-    <Checkbox id="terms" />
+const CheckboxPreview = () => {
+    const [checked, setChecked] = useState(false);
+    const [disabled, setDisabled] = useState(false);
+    const [labelText, setLabelText] = useState('Accept terms and conditions');
+
+    const code = `<div className="flex items-center space-x-2">
+    <Checkbox id="terms" checked={${checked}}${disabled ? ' disabled' : ''} />
     <label
         htmlFor="terms"
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
     >
-        Accept terms and conditions
+        ${labelText}
     </label>
-</div>
-        `}
-    >
-        <div className="flex items-center space-x-2">
-            <Checkbox id="terms" />
-            <label
-                htmlFor="terms"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-                Accept terms and conditions
-            </label>
-        </div>
-    </PreviewContainer>
-);
+</div>`;
+
+    return (
+        <DynamicPreviewContainer 
+            title="Checkbox"
+            code={code}
+            controls={
+                <>
+                    <div className='space-y-2'>
+                        <Label htmlFor="checkbox-label">Label Text</Label>
+                        <Input id="checkbox-label" value={labelText} onChange={(e) => setLabelText(e.target.value)} />
+                    </div>
+                    <div className="flex items-center space-x-2 pt-4">
+                        <Switch id="checked-switch" checked={checked} onCheckedChange={setChecked} />
+                        <Label htmlFor="checked-switch">Checked</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Switch id="disabled-switch" checked={disabled} onCheckedChange={setDisabled} />
+                        <Label htmlFor="disabled-switch">Disabled</Label>
+                    </div>
+                </>
+            }
+        >
+            <div className="flex items-center space-x-2">
+                <Checkbox id="terms" checked={checked} onCheckedChange={setChecked} disabled={disabled} />
+                <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                    {labelText}
+                </label>
+            </div>
+        </DynamicPreviewContainer>
+    );
+};
 
 const CollapsiblePreview = () => (
     <PreviewContainer 
@@ -729,11 +881,11 @@ const DialogPreview = () => (
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">Name</Label>
-                        <Input id="name" value="John Doe" className="col-span-3" />
+                        <Input id="name" defaultValue="John Doe" className="col-span-3" />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="username" className="text-right">Username</Label>
-                        <Input id="username" value="@johndoe" className="col-span-3" />
+                        <Input id="username" defaultValue="@johndoe" className="col-span-3" />
                     </div>
                 </div>
                 <DialogFooter>
@@ -795,7 +947,12 @@ const FormPreview = () => {
         },
     })
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
+        // This is a preview, so we won't actually submit.
+        // You can use the toast to show the values.
+        toast({
+            title: "Form Submitted",
+            description: `Username: ${values.username}`
+        })
     }
     return (
         <PreviewContainer 
@@ -865,24 +1022,51 @@ function onSubmit(values: z.infer<typeof formSchema>) {
 };
 
 
-const InputPreview = () => (
-    <PreviewContainer 
-        title="Inputs"
-        code={`
-<div className="w-full space-y-4 max-w-sm">
-    <Input placeholder="Default" />
-    <Input placeholder="Error state" className="border-destructive focus-visible:ring-destructive" />
-    <Input placeholder="Disabled" disabled />
-</div>
-        `}
-    >
-        <div className="w-full space-y-4 max-w-sm">
-            <Input placeholder="Default" />
-            <Input placeholder="Error state" className="border-destructive focus-visible:ring-destructive" />
-            <Input placeholder="Disabled" disabled />
-        </div>
-    </PreviewContainer>
-);
+const InputPreview = () => {
+    const [placeholder, setPlaceholder] = useState('Enter text...');
+    const [disabled, setDisabled] = useState(false);
+    const [type, setType] = useState('text');
+
+    const code = `<Input type="${type}" placeholder="${placeholder}" ${disabled ? 'disabled ' : ''}/>`;
+
+    return (
+        <DynamicPreviewContainer 
+            title="Input"
+            code={code}
+            controls={
+                <>
+                    <div className='space-y-2'>
+                        <Label htmlFor="input-placeholder">Placeholder</Label>
+                        <Input id="input-placeholder" value={placeholder} onChange={(e) => setPlaceholder(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label>Type</Label>
+                        <Select onValueChange={(v: any) => setType(v)} defaultValue={type}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="text">Text</SelectItem>
+                                <SelectItem value="password">Password</SelectItem>
+                                <SelectItem value="email">Email</SelectItem>
+                                <SelectItem value="number">Number</SelectItem>
+                                <SelectItem value="date">Date</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="flex items-center space-x-2 pt-4">
+                        <Switch id="input-disabled-switch" checked={disabled} onCheckedChange={setDisabled} />
+                        <Label htmlFor="input-disabled-switch">Disabled</Label>
+                    </div>
+                </>
+            }
+        >
+            <div className="w-full max-w-sm">
+                <Input type={type} placeholder={placeholder} disabled={disabled} />
+            </div>
+        </DynamicPreviewContainer>
+    );
+};
 
 const LabelPreview = () => (
     <PreviewContainer 
@@ -972,26 +1156,23 @@ const PopoverPreview = () => (
 );
 
 const ProgressPreview = () => {
-    const [progress, setProgress] = React.useState(13)
-    React.useEffect(() => {
-        const timer = setTimeout(() => setProgress(66), 500)
-        return () => clearTimeout(timer)
-    }, [])
+    const [progress, setProgress] = React.useState(66)
+    
+    const code = `<Progress value={${progress}} className="w-[60%]" />`;
+    
     return (
-        <PreviewContainer 
+         <DynamicPreviewContainer 
             title="Progress"
-            code={`
-const [progress, setProgress] = React.useState(13)
-React.useEffect(() => {
-    const timer = setTimeout(() => setProgress(66), 500)
-    return () => clearTimeout(timer)
-}, [])
-
-<Progress value={progress} className="w-[60%]" />
-            `}
+            code={code}
+            controls={
+                <div className='space-y-2'>
+                    <Label htmlFor="progress-value">Progress ({progress}%)</Label>
+                    <Slider id="progress-value" defaultValue={[progress]} max={100} step={1} onValueChange={(v) => setProgress(v[0])} />
+                </div>
+            }
         >
             <Progress value={progress} className="w-[60%]" />
-        </PreviewContainer>
+        </DynamicPreviewContainer>
     )
 };
 
@@ -1088,50 +1269,81 @@ const SelectPreview = () => (
     </PreviewContainer>
 );
 
-const SeparatorPreview = () => (
-    <PreviewContainer 
-        title="Separator"
-        code={`
+const SeparatorPreview = () => {
+    const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('horizontal');
+
+    const code = orientation === 'horizontal' ? `
 <div className="w-full max-w-sm">
     <div className="space-y-1">
         <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
         <p className="text-sm text-muted-foreground">An open-source UI component library.</p>
     </div>
     <Separator className="my-4" />
-    <div className="flex h-5 items-center space-x-4 text-sm">
-        <div>Blog</div>
-        <Separator orientation="vertical" />
-        <div>Docs</div>
-        <Separator orientation="vertical" />
-        <div>Source</div>
-    </div>
-</div>
-        `}
-    >
-        <div className="w-full max-w-sm">
-            <div className="space-y-1">
-                <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
-                <p className="text-sm text-muted-foreground">An open-source UI component library.</p>
-            </div>
-            <Separator className="my-4" />
-            <div className="flex h-5 items-center space-x-4 text-sm">
-                <div>Blog</div>
-                <Separator orientation="vertical" />
-                <div>Docs</div>
-                <Separator orientation="vertical" />
-                <div>Source</div>
-            </div>
-        </div>
-    </PreviewContainer>
-);
+    ...
+</div>` : `
+<div className="flex h-5 items-center space-x-4 text-sm">
+    <div>Blog</div>
+    <Separator orientation="vertical" />
+    <div>Docs</div>
+    <Separator orientation="vertical" />
+    <div>Source</div>
+</div>`;
 
-const SheetPreview = () => (
-    <PreviewContainer 
-        title="Sheet"
-        code={`
-<Sheet>
-    <SheetTrigger asChild><Button variant="outline">Open</Button></SheetTrigger>
-    <SheetContent>
+    return (
+        <DynamicPreviewContainer 
+            title="Separator"
+            code={code}
+            controls={
+                <div className='space-y-2'>
+                    <Label>Orientation</Label>
+                    <Select onValueChange={(v: any) => setOrientation(v)} defaultValue={orientation}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select orientation" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="horizontal">Horizontal</SelectItem>
+                            <SelectItem value="vertical">Vertical</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            }
+        >
+            <div className="w-full max-w-sm">
+                {orientation === 'horizontal' ? (
+                    <>
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
+                            <p className="text-sm text-muted-foreground">An open-source UI component library.</p>
+                        </div>
+                        <Separator className="my-4" />
+                        <div className="flex h-5 items-center space-x-4 text-sm">
+                            <div>Blog</div>
+                            <Separator orientation="vertical" />
+                            <div>Docs</div>
+                            <Separator orientation="vertical" />
+                            <div>Source</div>
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex h-5 items-center space-x-4 text-sm">
+                        <div>Blog</div>
+                        <Separator orientation="vertical" />
+                        <div>Docs</div>
+                        <Separator orientation="vertical" />
+                        <div>Source</div>
+                    </div>
+                )}
+            </div>
+        </DynamicPreviewContainer>
+    );
+};
+
+const SheetPreview = () => {
+    const [side, setSide] = useState<'top' | 'bottom' | 'left' | 'right'>('right');
+
+    const code = `<Sheet>
+    <SheetTrigger asChild><Button variant="outline">Open Sheet</Button></SheetTrigger>
+    <SheetContent side="${side}">
         <SheetHeader>
             <SheetTitle>Edit profile</SheetTitle>
             <SheetDescription>
@@ -1139,22 +1351,43 @@ const SheetPreview = () => (
             </SheetDescription>
         </SheetHeader>
     </SheetContent>
-</Sheet>
-        `}
-    >
-        <Sheet>
-            <SheetTrigger asChild><Button variant="outline">Open</Button></SheetTrigger>
-            <SheetContent>
-                <SheetHeader>
-                    <SheetTitle>Edit profile</SheetTitle>
-                    <SheetDescription>
-                        Make changes to your profile here. Click save when you're done.
-                    </SheetDescription>
-                </SheetHeader>
-            </SheetContent>
-        </Sheet>
-    </PreviewContainer>
-);
+</Sheet>`;
+
+    return (
+        <DynamicPreviewContainer 
+            title="Sheet"
+            code={code}
+            controls={
+                <div className='space-y-2'>
+                    <Label>Side</Label>
+                    <Select onValueChange={(v: any) => setSide(v)} defaultValue={side}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select side" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="top">Top</SelectItem>
+                            <SelectItem value="bottom">Bottom</SelectItem>
+                            <SelectItem value="left">Left</SelectItem>
+                            <SelectItem value="right">Right</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            }
+        >
+            <Sheet>
+                <SheetTrigger asChild><Button variant="outline">Open</Button></SheetTrigger>
+                <SheetContent side={side}>
+                    <SheetHeader>
+                        <SheetTitle>Edit profile</SheetTitle>
+                        <SheetDescription>
+                            Make changes to your profile here. Click save when you're done.
+                        </SheetDescription>
+                    </SheetHeader>
+                </SheetContent>
+            </Sheet>
+        </DynamicPreviewContainer>
+    );
+};
 
 const SkeletonPreview = () => (
     <PreviewContainer 
@@ -1179,33 +1412,67 @@ const SkeletonPreview = () => (
     </PreviewContainer>
 );
 
-const SliderPreview = () => (
-    <PreviewContainer 
-        title="Slider"
-        code={`
-<Slider defaultValue={[50]} max={100} step={1} className="w-[60%]" />
-        `}
-    >
-        <Slider defaultValue={[50]} max={100} step={1} className="w-[60%]" />
-    </PreviewContainer>
-);
+const SliderPreview = () => {
+    const [value, setValue] = useState(50);
+    const [step, setStep] = useState(1);
 
-const SwitchPreview = () => (
-    <PreviewContainer 
-        title="Switch"
-        code={`
-<div className="flex items-center space-x-2">
-    <Switch id="airplane-mode" />
+    const code = `<Slider defaultValue={[${value}]} max={100} step={${step}} className="w-[60%]" />`;
+
+    return (
+        <DynamicPreviewContainer 
+            title="Slider"
+            code={code}
+            controls={
+                 <>
+                    <div className='space-y-2'>
+                        <Label htmlFor="slider-value">Value ({value})</Label>
+                        <Slider id="slider-value" defaultValue={[value]} max={100} step={step} onValueChange={(v) => setValue(v[0])} />
+                    </div>
+                    <div className='space-y-2'>
+                        <Label htmlFor="slider-step">Step</Label>
+                        <Input id="slider-step" type="number" value={step} onChange={(e) => setStep(Number(e.target.value) || 1)} />
+                    </div>
+                </>
+            }
+        >
+            <Slider defaultValue={[value]} max={100} step={step} onValueChange={(v) => setValue(v[0])} className="w-[60%]" />
+        </DynamicPreviewContainer>
+    );
+};
+
+const SwitchPreview = () => {
+    const [checked, setChecked] = useState(false);
+    const [disabled, setDisabled] = useState(false);
+
+    const code = `<div className="flex items-center space-x-2">
+    <Switch id="airplane-mode" checked={${checked}}${disabled ? ' disabled' : ''} />
     <Label htmlFor="airplane-mode">Airplane Mode</Label>
-</div>
-        `}
-    >
-        <div className="flex items-center space-x-2">
-            <Switch id="airplane-mode" />
-            <Label htmlFor="airplane-mode">Airplane Mode</Label>
-        </div>
-    </PreviewContainer>
-);
+</div>`;
+
+    return (
+        <DynamicPreviewContainer 
+            title="Switch"
+            code={code}
+            controls={
+                <>
+                    <div className="flex items-center space-x-2">
+                        <Switch id="switch-checked-switch" checked={checked} onCheckedChange={setChecked} />
+                        <Label htmlFor="switch-checked-switch">Checked</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Switch id="switch-disabled-switch" checked={disabled} onCheckedChange={setDisabled} />
+                        <Label htmlFor="switch-disabled-switch">Disabled</Label>
+                    </div>
+                </>
+            }
+        >
+            <div className="flex items-center space-x-2">
+                <Switch id="airplane-mode" checked={checked} onCheckedChange={setChecked} disabled={disabled}/>
+                <Label htmlFor="airplane-mode">Airplane Mode</Label>
+            </div>
+        </DynamicPreviewContainer>
+    );
+};
 
 const TablePreview = () => (
     <PreviewContainer 
@@ -1345,16 +1612,33 @@ const TabsPreview = () => (
     </PreviewContainer>
 );
 
-const TextareaPreview = () => (
-    <PreviewContainer 
-        title="Textarea"
-        code={`
-<Textarea placeholder="Type your message here." className="max-w-sm"/>
-        `}
-    >
-        <Textarea placeholder="Type your message here." className="max-w-sm"/>
-    </PreviewContainer>
-);
+const TextareaPreview = () => {
+    const [placeholder, setPlaceholder] = useState('Type your message here.');
+    const [disabled, setDisabled] = useState(false);
+
+    const code = `<Textarea placeholder="${placeholder}" ${disabled ? 'disabled ' : ''}className="max-w-sm"/>`;
+    
+    return (
+        <DynamicPreviewContainer 
+            title="Textarea"
+            code={code}
+            controls={
+                <>
+                    <div className='space-y-2'>
+                        <Label htmlFor="textarea-placeholder">Placeholder</Label>
+                        <Input id="textarea-placeholder" value={placeholder} onChange={(e) => setPlaceholder(e.target.value)} />
+                    </div>
+                    <div className="flex items-center space-x-2 pt-4">
+                        <Switch id="textarea-disabled-switch" checked={disabled} onCheckedChange={setDisabled} />
+                        <Label htmlFor="textarea-disabled-switch">Disabled</Label>
+                    </div>
+                </>
+            }
+        >
+            <Textarea placeholder={placeholder} disabled={disabled} className="max-w-sm"/>
+        </DynamicPreviewContainer>
+    );
+};
 
 const ToastPreview = () => {
     const { toast } = useToast();
@@ -1470,4 +1754,6 @@ const SidebarHeaderPreview = () => (
         </div>
     </PreviewContainer>
 );
+    
+
     
