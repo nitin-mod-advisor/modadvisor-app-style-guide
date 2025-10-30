@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { INITIAL_TOKENS, type ColorToken } from '@/lib/style-guide-data';
 import { ColorPalette } from '@/components/style-guide/color-palette';
 import { CodePreviews } from '@/components/style-guide/code-previews';
+import { ComponentPreviews } from '@/components/style-guide/component-previews';
 
 export default function Home() {
   const [tokens, setTokens] = useState<ColorToken[]>(INITIAL_TOKENS);
@@ -14,7 +15,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !isClient) return;
 
     const styleId = 'live-style-guide-variables';
     let styleTag = document.getElementById(styleId);
@@ -36,7 +37,7 @@ export default function Home() {
 }
     `.trim();
 
-  }, [tokens]);
+  }, [tokens, isClient]);
 
   const handleColorChange = (tokenName: string, theme: 'light' | 'dark', value: string) => {
     setTokens(currentTokens =>
@@ -57,12 +58,7 @@ export default function Home() {
         <CodePreviews tokens={tokens} />
       </div>
       <div className="lg:col-span-3 bg-surface-2 p-4 sm:p-6 lg:p-8 lg:h-screen lg:overflow-y-auto">
-        <div className="p-4 sm:p-6 lg:p-8">
-            <h2 className="text-2xl font-bold mb-4">Live Component Preview</h2>
-            <p className="text-text-muted mb-8">
-                The components on the right will update automatically as you change the color tokens.
-            </p>
-        </div>
+        <ComponentPreviews />
       </div>
     </div>
   );
