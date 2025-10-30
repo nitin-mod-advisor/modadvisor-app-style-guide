@@ -1,7 +1,8 @@
+
 "use client"
 
 import React, { useEffect, useState } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,8 +11,7 @@ import { INITIAL_TOKENS } from '@/lib/style-guide-data';
 import { ColorPalette } from '@/components/style-guide/color-palette';
 import { CodePreviews } from '@/components/style-guide/code-previews';
 import { type ColorToken, type ColorPalette as ColorPaletteType } from '@/lib/types';
-import { useFirestore, useDoc, useMemoFirebase, useUser, initiateAnonymousSignIn, useAuth } from '@/firebase';
-import { useTheme } from 'next-themes';
+import { useFirestore, useDoc, useMemoFirebase, useUser, initiateAnonymousSignIn, useAuth, setDocumentNonBlocking } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -125,13 +125,12 @@ function AddVariableDialog({ onAddVariable }: { onAddVariable: (variable: ColorT
 }
 
 export default function Home() {
-  const [tokens, setTokens] = useState<ColorToken[]>(INITIAL_TOKENS);
+  const [tokens, setTokens] = useState<ColorToken[]>([]);
   const [isClient, setIsClient] = React.useState(false);
 
   const firestore = useFirestore();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
-  const { theme } = useTheme();
   
   const paletteRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -162,39 +161,44 @@ export default function Home() {
         id: PALETTE_ID,
         tokens: INITIAL_TOKENS,
       };
-      setDoc(paletteRef, initialPalette);
+      setDocumentNonBlocking(paletteRef, initialPalette, { merge: false });
     }
   }, [isPaletteLoading, paletteData, paletteRef]);
   
   useEffect(() => {
-    if (typeof window === 'undefined' || !isClient) return;
+    if (typeof window === 'undefined' || !isClient || tokens.length === 0) return;
 
-    const styleId = 'live-style-guide-variables';
-    let styleTag = document.getElementById(styleId);
+    const styleId = 'dynamic-theme-styles';
+    let styleTag = document.getElementById(styleId) as HTMLStyleElement | null;
     if (!styleTag) {
       styleTag = document.createElement('style');
       styleTag.id = styleId;
       document.head.appendChild(styleTag);
     }
     
-    const currentTheme = theme === 'system' 
-      ? window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light' 
-      : theme;
+    const lightVars = tokens.map(token => {
+        const value = token.light;
+        const hslValues = value.startsWith('hsl') ? value.replace('hsl(', '').replace(')', '').replace(/%/g, '') : value;
+        return `  ${token.name}: ${hslValues};`;
+    }).join('\n');
 
-    const root = document.documentElement;
+    const darkVars = tokens.map(token => {
+        const value = token.dark;
+        const hslValues = value.startsWith('hsl') ? value.replace('hsl(', '').replace(')', '').replace(/%/g, '') : value;
+        return `  ${token.name}: ${hslValues};`;
+    }).join('\n');
+    
+    const css = `
+:root {
+${lightVars}
+}
+.dark {
+${darkVars}
+}`;
 
-    tokens.forEach(token => {
-      const value = currentTheme === 'light' ? token.light : token.dark;
-       if (value.startsWith('hsl')) {
-        const hslValues = value.replace('hsl(', '').replace(')', '').replace(/%/g, '');
-        root.style.setProperty(token.name, hslValues);
-      } else {
-        // Fallback for hex or other direct values, though HSL is preferred for theming
-        root.style.setProperty(token.name, value);
-      }
-    });
+    styleTag.innerHTML = css;
 
-  }, [tokens, theme, isClient]);
+  }, [tokens, isClient]);
 
   const handleColorChange = (tokenName: string, theme: 'light' | 'dark', value: string) => {
     const newTokens = tokens.map(token =>
@@ -202,7 +206,7 @@ export default function Home() {
     );
     setTokens(newTokens);
     if (paletteRef) {
-      setDoc(paletteRef, { tokens: newTokens }, { merge: true });
+      setDocumentNonBlocking(paletteRef, { tokens: newTokens }, { merge: true });
     }
   };
 
@@ -210,11 +214,11 @@ export default function Home() {
     const newTokens = [...tokens, variable];
     setTokens(newTokens);
     if (paletteRef) {
-      setDoc(paletteRef, { tokens: newTokens }, { merge: true });
+      setDocumentNonBlocking(paletteRef, { tokens: newTokens }, { merge: true });
     }
   };
   
-  if (!isClient || isUserLoading || isPaletteLoading) {
+  if (!isClient || isUserLoading || (isPaletteLoading && !paletteData)) {
     return (
         <div className="flex items-center justify-center h-screen">
             <p>Loading...</p>
@@ -233,3 +237,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
