@@ -46,10 +46,10 @@ function ComponentsSubMenu() {
             <CollapsibleContent>
                 <SidebarMenuSub>
                     <SidebarMenuSubItem>
-                         <Link href="/components" passHref>
-                            <SidebarMenuSubButton isActive={pathname === '/components'}>
+                        <Link href="/components" className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-text-muted hover:bg-surface-2">
+                           <SidebarMenuSubButton isActive={pathname === '/components'}>
                                 All Components
-                            </SidebarMenuSubButton>
+                           </SidebarMenuSubButton>
                         </Link>
                     </SidebarMenuSubItem>
                 </SidebarMenuSub>
