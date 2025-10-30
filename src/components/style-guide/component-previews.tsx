@@ -42,6 +42,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Clipboard } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ComponentPreviewsProps {
   componentToShow?: string;
@@ -318,22 +319,67 @@ const BadgePreview = () => (
     </PreviewContainer>
 );
 
-const ButtonPreview = () => (
-    <PreviewContainer 
-        title="Buttons"
-        code={`
-<Button>Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="destructive">Destructive</Button>
-<Button disabled>Disabled</Button>
-        `}
-    >
-        <Button>Primary</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button disabled>Disabled</Button>
-    </PreviewContainer>
-)
+const ButtonPreview = () => {
+    const [variant, setVariant] = useState<'default' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link'>('default');
+    const [className, setClassName] = useState('');
+
+    const code = `<Button variant="${variant}" className="${className}">\n  Dynamic Button\n</Button>`;
+
+    return (
+        <div className="space-y-6 mt-8">
+            <h3 className="font-semibold text-xl text-foreground">Buttons</h3>
+            <div className="space-y-4">
+                <h4 className="font-medium text-lg text-muted-foreground">Preview</h4>
+                <div className="p-6 bg-card rounded-lg border border-border flex flex-wrap gap-4 items-center justify-center">
+                    <Button variant={variant} className={cn(className)}>
+                        Dynamic Button
+                    </Button>
+                </div>
+            </div>
+             <div className="space-y-4">
+                <h4 className="font-medium text-lg text-muted-foreground">Controls</h4>
+                <div className="p-6 bg-card rounded-lg border border-border grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className='space-y-2'>
+                        <Label>Variant</Label>
+                        <Select onValueChange={(v: any) => setVariant(v)} defaultValue={variant}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select variant" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="default">Default</SelectItem>
+                                <SelectItem value="secondary">Secondary</SelectItem>
+                                <SelectItem value="destructive">Destructive</SelectItem>
+                                <SelectItem value="outline">Outline</SelectItem>
+                                <SelectItem value="ghost">Ghost</SelectItem>
+                                <SelectItem value="link">Link</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                     <div className='space-y-2'>
+                        <Label htmlFor="button-classname">ClassName</Label>
+                        <Input 
+                            id="button-classname"
+                            placeholder="e.g. bg-blue-500 hover:bg-blue-600"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                        />
+                    </div>
+                </div>
+            </div>
+            <div className="space-y-4">
+                <h4 className="font-medium text-lg text-muted-foreground">How to use</h4>
+                <div className="relative group">
+                     <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => navigator.clipboard.writeText(code)} aria-label="Copy code">
+                        <Clipboard className="h-4 w-4" />
+                    </Button>
+                    <pre className="bg-muted border border-border rounded-lg p-4 text-xs font-mono overflow-x-auto">
+                        <code>{code}</code>
+                    </pre>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 const CalendarPreview = () => {
     const [date, setDate] = useState<Date | undefined>(new Date());
