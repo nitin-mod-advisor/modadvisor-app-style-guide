@@ -38,16 +38,18 @@ function ComponentsSubMenu() {
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger asChild>
                 <SidebarMenuButton>
-                    <Component />
-                    <span>Components</span>
-                    <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-180" />
+                  <Component />
+                  <span>Components</span>
+                  <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-180" />
                 </SidebarMenuButton>
             </CollapsibleTrigger>
             <CollapsibleContent>
                 <SidebarMenuSub>
                     <SidebarMenuSubItem>
-                        <Link href="/components">
-                            <SidebarMenuSubButton isActive={pathname === '/components'}>All Components</SidebarMenuSubButton>
+                        <Link href="/components" passHref legacyBehavior>
+                            <SidebarMenuSubButton isActive={pathname === '/components'} asChild>
+                                <a>All Components</a>
+                            </SidebarMenuSubButton>
                         </Link>
                     </SidebarMenuSubItem>
                 </SidebarMenuSub>
