@@ -10,8 +10,8 @@ interface ColorPaletteProps {
   onColorChange: (tokenName: string, theme: 'light' | 'dark', value: string) => void;
 }
 
-function convertToHex(hsl: string) {
-  if (hsl.startsWith('#')) return hsl;
+function convertHslToHex(hsl: string) {
+  if (hsl.startsWith('#')) return hsl.toUpperCase();
   if (!hsl.startsWith('hsl')) return '#000000';
 
   try {
@@ -34,11 +34,41 @@ function convertToHex(hsl: string) {
       const hex = Math.round((c + m) * 255).toString(16);
       return hex.length === 1 ? '0' + hex : hex;
     };
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
   } catch (e) {
     return '#000000';
   }
 }
+
+function convertHexToHsl(hex: string): string {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!result) return 'hsl(0 0% 0%)';
+    
+    let r = parseInt(result[1], 16) / 255;
+    let g = parseInt(result[2], 16) / 255;
+    let b = parseInt(result[3], 16) / 255;
+
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+
+    if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    h = Math.round(h * 360);
+    s = Math.round(s * 100);
+    l = Math.round(l * 100);
+
+    return `hsl(${h} ${s}% ${l}%)`;
+}
+
 
 export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
   const { theme } = useTheme();
@@ -48,12 +78,12 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
   };
   
   const handlePickerChange = (tokenName: string, theme: 'light' | 'dark', hexValue: string) => {
-    onColorChange(tokenName, theme, hexValue);
+    const hslValue = convertHexToHsl(hexValue);
+    onColorChange(tokenName, theme, hslValue);
   };
 
   return (
     <section>
-      <h2 className="text-2xl font-bold mb-4">Color Palette</h2>
       <div className="w-full overflow-x-auto">
         <table className="w-full min-w-max border-collapse">
           <thead>
@@ -74,7 +104,7 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
                     <div className="relative w-8 h-8">
                       <input
                         type="color"
-                        value={convertToHex(token.light)}
+                        value={convertHslToHex(token.light)}
                         onChange={(e) => handlePickerChange(token.name, 'light', e.target.value)}
                         className="w-full h-full p-0 border-none rounded-md cursor-pointer bg-transparent absolute inset-0 opacity-0"
                         aria-label={`Light theme color for ${token.name}`}
@@ -98,7 +128,7 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
                      <div className="relative w-8 h-8">
                       <input
                         type="color"
-                        value={convertToHex(token.dark)}
+                        value={convertHslToHex(token.dark)}
                         onChange={(e) => handlePickerChange(token.name, 'dark', e.target.value)}
                         className="w-full h-full p-0 border-none rounded-md cursor-pointer bg-transparent absolute inset-0 opacity-0"
                         aria-label={`Dark theme color for ${token.name}`}
