@@ -153,11 +153,17 @@ export default function Home() {
   useEffect(() => {
     if (paletteData) {
       setTokens(paletteData.tokens);
+    } else if (!isPaletteLoading) {
+      // If not loading and still no data, it means we should use the initial tokens.
+      // This happens on the very first load before the bootstrap effect runs.
+      setTokens(INITIAL_TOKENS);
     }
-  }, [paletteData]);
+  }, [paletteData, isPaletteLoading]);
 
   // Effect for bootstrapping the initial palette in Firestore
   useEffect(() => {
+    // This effect runs once after the initial loading state is resolved.
+    // If there's no data, it means the document doesn't exist, so we create it.
     if (!isPaletteLoading && !paletteData && paletteRef) {
       const initialPalette: ColorPaletteType = {
         id: PALETTE_ID,
@@ -180,21 +186,25 @@ export default function Home() {
     }
     
     const lightVars = tokens.map(token => {
-        const value = token.light;
-        const hslValues = value.startsWith('hsl') ? value.replace('hsl(', '').replace(')', '').replace(/%/g, '') : value;
-        return `  ${token.name}: ${hslValues};`;
+        // For HSL, extract just the numbers. For hex, use as is.
+        const value = token.light.startsWith('hsl') 
+            ? token.light.replace('hsl(', '').replace(')', '').replace(/%/g, '')
+            : token.light;
+        return `  ${token.name}: ${value};`;
     }).join('\n');
 
     const darkVars = tokens.map(token => {
-        const value = token.dark;
-        const hslValues = value.startsWith('hsl') ? value.replace('hsl(', '').replace(')', '').replace(/%/g, '') : value;
-        return `  ${token.name}: ${hslValues};`;
+        const value = token.dark.startsWith('hsl') 
+            ? token.dark.replace('hsl(', '').replace(')', '').replace(/%/g, '')
+            : token.dark;
+        return `  ${token.name}: ${value};`;
     }).join('\n');
     
     const css = `
 :root {
 ${lightVars}
 }
+
 .dark {
 ${darkVars}
 }`;
@@ -203,25 +213,26 @@ ${darkVars}
 
   }, [tokens, isClient]);
 
-  const handleColorChange = (tokenName: string, theme: 'light' | 'dark', value: string) => {
-    const newTokens = tokens.map(token =>
-      token.name === tokenName ? { ...token, [theme]: value } : token
-    );
+  const updateTokens = (newTokens: ColorToken[]) => {
     setTokens(newTokens);
     if (paletteRef) {
       setDocumentNonBlocking(paletteRef, { tokens: newTokens }, { merge: true });
     }
   };
 
+  const handleColorChange = (tokenName: string, theme: 'light' | 'dark', value: string) => {
+    const newTokens = tokens.map(token =>
+      token.name === tokenName ? { ...token, [theme]: value } : token
+    );
+    updateTokens(newTokens);
+  };
+
   const handleAddVariable = (variable: ColorToken) => {
     const newTokens = [...tokens, variable];
-    setTokens(newTokens);
-    if (paletteRef) {
-      setDocumentNonBlocking(paletteRef, { tokens: newTokens }, { merge: true });
-    }
+    updateTokens(newTokens);
   };
   
-  if (!isClient || isUserLoading || (isPaletteLoading && !paletteData)) {
+  if (!isClient || isUserLoading || isPaletteLoading) {
     return (
         <div className="flex items-center justify-center h-screen">
             <p>Loading...</p>
