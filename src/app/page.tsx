@@ -232,10 +232,10 @@ ${darkVars}
     updateTokens(newTokens);
   };
   
-  if (!isClient || isUserLoading || isPaletteLoading) {
+  if (!isClient || isUserLoading || (isPaletteLoading && !paletteData)) {
     return (
         <div className="flex items-center justify-center h-screen">
-            <p>Loading...</p>
+            <p>Loading style guide...</p>
         </div>
     );
   }
