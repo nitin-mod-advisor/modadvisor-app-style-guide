@@ -1,111 +1,45 @@
 /**
- * @fileoverview Firestore Security Rules for Color Palette Management.
+ * @file Firestore Security Rules
+ * @description This ruleset governs access to the `/color_palettes` collection, enabling authenticated users to read and write color palette documents.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model, where each user can only access their own color palettes and associated colors.
+ * This ruleset allows any authenticated user to read and write color palettes. There is no ownership concept.
  *
  * Data Structure:
- * All data is nested under /users/{userId}, ensuring that each user has a private data tree.
- * - /users/{userId}/colorPalettes/{colorPaletteId}: Stores color palette documents.
- * - /users/{userId}/colorPalettes/{colorPaletteId}/colors/{colorId}: Stores individual color documents within a palette.
+ * All color palettes are stored in the `/color_palettes/{colorPaletteId}` collection.
  *
  * Key Security Decisions:
- * - Users can only create, read, update, and delete their own color palettes and colors.
- * - Listing color palettes and colors is restricted to the owner.
- *
- * Denormalization for Authorization:
- * The user ID is encoded directly in the path (/users/{userId}), eliminating the need for additional data fields or `get()` calls to determine ownership.
+ * - Authenticated users can read any color palette.
+ * - Authenticated users can create, update, and delete any color palette.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to color palettes owned by a specific user.
-     * @path /users/{userId}/colorPalettes/{colorPaletteId}
-     * @allow (create) Authenticated user creates a new color palette with a matching userId.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123', data: { id: 'palette_123', name: 'My Palette', colors: [] } }
-     * @allow (get) Authenticated user retrieves their own color palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123' }
-     * @allow (update) Authenticated user updates their own existing color palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123', data: { name: 'Updated Palette Name' } }
-     * @allow (delete) Authenticated user deletes their own existing color palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123' }
-     * @allow (list) Authenticated user lists their own color palettes.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes' }
-     * @deny (create) Authenticated user attempts to create a color palette for another user.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_xyz/colorPalettes/palette_123', data: { id: 'palette_123', name: 'My Palette', colors: [] } }
-     * @deny (get) Authenticated user attempts to retrieve a color palette owned by another user.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_xyz/colorPalettes/palette_123' }
-     * @deny (update) Authenticated user attempts to update a color palette owned by another user.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_xyz/colorPalettes/palette_123', data: { name: 'Updated Palette Name' } }
-     * @deny (delete) Authenticated user attempts to delete a color palette owned by another user.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_xyz/colorPalettes/palette_123' }
-     * @principle Enforces document ownership for writes.  Path-based ownership simplifies rule logic and enhances security.
+     * @description Controls read and write access to individual color palettes.
+     * @path /color_palettes/{colorPaletteId}
+     * @allow (get) - Any authenticated user can read a color palette.
+     * @allow (list) - Any authenticated user can list color palettes.
+     * @allow (create) - Any authenticated user can create a color palette.
+     * @allow (update) - Any authenticated user can update a color palette.
+     * @allow (delete) - Any authenticated user can delete a color palette.
+     * @deny (create) - Not authenticated user can create a color palette.
+     * @deny (update) - Not authenticated user can update a color palette.
+     * @deny (delete) - Not authenticated user can delete a color palette.
+     * @principle Allows authenticated users to read and write color palettes.
      */
-    match /users/{userId}/colorPalettes/{colorPaletteId} {
-      // Helper function to check if the authenticated user is the owner
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      // Helper function to check if the authenticated user is the owner, and the document exists
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      // Read rules
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-
-      // Write rules
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+    match /color_palettes/{colorPaletteId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
     }
 
-    /**
-     * @description Controls access to individual color tokens within a color palette owned by a specific user.
-     * @path /users/{userId}/colorPalettes/{colorPaletteId}/colors/{colorId}
-     * @allow (create) Authenticated user creates a new color in their own palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123/colors/color_456', data: { id: 'color_456', colorPaletteId: 'palette_123', token: '--primary', role: 'Brand Color', light: '#FFFFFF', dark: '#000000' } }
-     * @allow (get) Authenticated user retrieves a color from their own palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123/colors/color_456' }
-     * @allow (update) Authenticated user updates a color in their own palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123/colors/color_456', data: { light: '#F0F0F0' } }
-     * @allow (delete) Authenticated user deletes a color from their own palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123/colors/color_456' }
-     * @allow (list) Authenticated user lists colors in their own palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_abc/colorPalettes/palette_123/colors' }
-     * @deny (create) Authenticated user attempts to create a color in another user's palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_xyz/colorPalettes/palette_123/colors/color_456', data: { id: 'color_456', colorPaletteId: 'palette_123', token: '--primary', role: 'Brand Color', light: '#FFFFFF', dark: '#000000' } }
-     * @deny (get) Authenticated user attempts to retrieve a color from another user's palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_xyz/colorPalettes/palette_123/colors/color_456' }
-     * @deny (update) Authenticated user attempts to update a color in another user's palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_xyz/colorPalettes/palette_123/colors/color_456', data: { light: '#F0F0F0' } }
-     * @deny (delete) Authenticated user attempts to delete a color from another user's palette.
-     *   Request: { auth: { uid: 'user_abc' }, path: '/databases/(default)/documents/users/user_xyz/colorPalettes/palette_123/colors/color_456' }
-     * @principle Enforces document ownership for all operations. Authorization is strictly based on path and authenticated user ID.
-     */
-    match /users/{userId}/colorPalettes/{colorPaletteId}/colors/{colorId} {
-      // Helper function to check if the authenticated user is the owner
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      // Helper function to check if the authenticated user is the owner, and the document exists
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      // Read rules
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-
-      // Write rules
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+    // Helper function to check if a user is signed in
+    function isSignedIn() {
+      return request.auth != null;
     }
   }
 }

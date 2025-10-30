@@ -1,10 +1,10 @@
-
 {
   "entities": {
     "ColorPalette": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "ColorPalette",
       "type": "object",
-      "description": "Represents a color palette with light and dark theme colors.",
+      "description": "Represents a color palette with semantic color tokens for light and dark themes.",
       "properties": {
         "id": {
           "type": "string",
@@ -12,75 +12,236 @@
         },
         "name": {
           "type": "string",
-          "description": "Name of the color palette (e.g., 'Default', 'Cool Blue')."
+          "description": "Name of the color palette (e.g., 'Default Style Guide')."
         },
         "description": {
           "type": "string",
-          "description": "A brief description of the color palette."
+          "description": "A description of the color palette and its intended use."
+        },
+        "lightBg": {
+          "type": "string",
+          "description": "Background color for the light theme.",
+          "format": "string"
+        },
+        "lightSurface": {
+          "type": "string",
+          "description": "Surface color for the light theme (cards, modals).",
+          "format": "string"
+        },
+        "lightSurface2": {
+          "type": "string",
+          "description": "Muted surface color for the light theme.",
+          "format": "string"
+        },
+        "lightText": {
+          "type": "string",
+          "description": "Primary text color for the light theme.",
+          "format": "string"
+        },
+        "lightTextMuted": {
+          "type": "string",
+          "description": "Secondary text color for the light theme.",
+          "format": "string"
+        },
+        "lightBorder": {
+          "type": "string",
+          "description": "Border color for the light theme.",
+          "format": "string"
+        },
+        "lightRing": {
+          "type": "string",
+          "description": "Focus ring color for the light theme.",
+          "format": "string"
+        },
+        "lightPrimary": {
+          "type": "string",
+          "description": "Brand color for the light theme.",
+          "format": "string"
+        },
+        "lightAccent": {
+          "type": "string",
+          "description": "Highlight color for the light theme.",
+          "format": "string"
+        },
+        "lightSuccess": {
+          "type": "string",
+          "description": "Success color for the light theme.",
+          "format": "string"
+        },
+        "lightWarning": {
+          "type": "string",
+          "description": "Warning color for the light theme.",
+          "format": "string"
+        },
+        "lightError": {
+          "type": "string",
+          "description": "Error color for the light theme.",
+          "format": "string"
+        },
+        "lightInfo": {
+          "type": "string",
+          "description": "Info color for the light theme.",
+          "format": "string"
+        },
+        "darkBg": {
+          "type": "string",
+          "description": "Background color for the dark theme.",
+          "format": "string"
+        },
+        "darkSurface": {
+          "type": "string",
+          "description": "Surface color for the dark theme (cards, modals).",
+          "format": "string"
+        },
+        "darkSurface2": {
+          "type": "string",
+          "description": "Muted surface color for the dark theme.",
+          "format": "string"
+        },
+        "darkText": {
+          "type": "string",
+          "description": "Primary text color for the dark theme.",
+          "format": "string"
+        },
+        "darkTextMuted": {
+          "type": "string",
+          "description": "Secondary text color for the dark theme.",
+          "format": "string"
+        },
+        "darkBorder": {
+          "type": "string",
+          "description": "Border color for the dark theme.",
+          "format": "string"
+        },
+        "darkRing": {
+          "type": "string",
+          "description": "Focus ring color for the dark theme.",
+          "format": "string"
+        },
+        "darkPrimary": {
+          "type": "string",
+          "description": "Brand color for the dark theme.",
+          "format": "string"
+        },
+        "darkAccent": {
+          "type": "string",
+          "description": "Highlight color for the dark theme.",
+          "format": "string"
+        },
+        "darkSuccess": {
+          "type": "string",
+          "description": "Success color for the dark theme.",
+          "format": "string"
+        },
+        "darkWarning": {
+          "type": "string",
+          "description": "Warning color for the dark theme.",
+          "format": "string"
+        },
+        "darkError": {
+          "type": "string",
+          "description": "Error color for the dark theme.",
+          "format": "string"
+        },
+        "darkInfo": {
+          "type": "string",
+          "description": "Info color for the dark theme.",
+          "format": "string"
+        },
+        "radiusSm": {
+          "type": "string",
+          "description": "Small border radius value."
+        },
+        "radiusMd": {
+          "type": "string",
+          "description": "Medium border radius value."
+        },
+        "radiusLg": {
+          "type": "string",
+          "description": "Large border radius value."
+        },
+        "radiusFull": {
+          "type": "string",
+          "description": "Full border radius value."
+        },
+        "shadowSm": {
+          "type": "string",
+          "description": "Small box shadow value."
+        },
+        "shadowMd": {
+          "type": "string",
+          "description": "Medium box shadow value."
+        },
+        "shadowLg": {
+          "type": "string",
+          "description": "Large box shadow value."
         }
       },
       "required": [
         "id",
-        "name"
-      ]
-    },
-    "Color": {
-      "title": "Color",
-      "type": "object",
-      "description": "Represents a single color token with light and dark mode values.",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The semantic token name (e.g., '--bg', '--primary')."
-        },
-        "role": {
-          "type": "string",
-          "description": "The role of the color (e.g., 'Page background', 'Brand color')."
-        },
-        "light": {
-          "type": "string",
-          "description": "The color value for light mode (e.g., '#F8FAFC')."
-        },
-        "dark": {
-          "type": "string",
-          "description": "The color value for dark mode (e.g., '#0B1220')."
-        }
-      },
-      "required": [
         "name",
-        "role",
-        "light",
-        "dark"
+        "description",
+        "lightBg",
+        "lightSurface",
+        "lightSurface2",
+        "lightText",
+        "lightTextMuted",
+        "lightBorder",
+        "lightRing",
+        "lightPrimary",
+        "lightAccent",
+        "lightSuccess",
+        "lightWarning",
+        "lightError",
+        "lightInfo",
+        "darkBg",
+        "darkSurface",
+        "darkSurface2",
+        "darkText",
+        "darkTextMuted",
+        "darkBorder",
+        "darkRing",
+        "darkPrimary",
+        "darkAccent",
+        "darkSuccess",
+        "darkWarning",
+        "darkError",
+        "darkInfo",
+        "radiusSm",
+        "radiusMd",
+        "radiusLg",
+        "radiusFull",
+        "shadowSm",
+        "shadowMd",
+        "shadowLg"
       ]
     }
   },
   "auth": {
     "providers": [
+      "password",
       "anonymous"
     ]
   },
   "firestore": {
     "structure": [
       {
-        "path": "/users/{userId}/colorPalettes/{colorPaletteId}",
+        "path": "/color_palettes/{colorPaletteId}",
         "definition": {
           "entityName": "ColorPalette",
           "schema": {
-            "$ref": "#/entities/ColorPalette"
+            "$ref": "#/backend/entities/ColorPalette"
           },
-          "description": "Stores color palettes owned by a specific user."
-        }
-      },
-      {
-        "path": "/users/{userId}/colorPalettes/{colorPaletteId}/colors/{colorId}",
-        "definition": {
-          "entityName": "Color",
-          "schema": {
-            "$ref": "#/entities/Color"
-          },
-          "description": "Stores individual color tokens within a color palette."
+          "description": "Stores individual color palettes.  '{colorPaletteId}' is the unique ID of the color palette.",
+          "params": [
+            {
+              "name": "colorPaletteId",
+              "description": "Unique identifier for the color palette."
+            }
+          ]
         }
       }
-    ]
+    ],
+    "reasoning": "Given the requirement to store and update color palettes, and the need for initial default data, the most straightforward and secure approach is to use a single collection, `/color_palettes/{colorPaletteId}`.  Since the application requires read and write access to a single color palette, path-based authorization isn't directly applicable.  Instead, we'll leverage the single collection structure which simplifies security rules and queries while fulfilling the specific use case outlined in the request. Since there is no ownership or collaborative model here, no denormalization is needed."
   }
 }
