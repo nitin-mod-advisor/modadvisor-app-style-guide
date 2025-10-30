@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from "@/components/ui/toaster";
+import LiveStyleGuide from '@/components/style-guide/live-style-guide';
 
 export const metadata: Metadata = {
   title: 'Live Style Guide Editor',
@@ -26,7 +27,9 @@ export default function RootLayout({
           defaultTheme="light"
           enableSystem={false}
         >
-          {children}
+          <LiveStyleGuide>
+            {children}
+          </LiveStyleGuide>
           <Toaster />
         </ThemeProvider>
       </body>
