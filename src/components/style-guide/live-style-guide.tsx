@@ -93,7 +93,7 @@ export default function LiveStyleGuide({
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 h-16 bg-surface/80 backdrop-blur-sm border-b border-border">
-          <SidebarTrigger asChild>
+          <SidebarTrigger>
               <Button variant="ghost" size="icon"><Palette/></Button>
           </SidebarTrigger>
           <ThemeToggle />
