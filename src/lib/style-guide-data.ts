@@ -1,9 +1,4 @@
-export type ColorToken = {
-  name: string;
-  role: string;
-  light: string;
-  dark: string;
-};
+import { ColorToken } from "./types";
 
 export const INITIAL_TOKENS: ColorToken[] = [
   { name: '--bg', role: 'Page background', light: '#F8FAFC', dark: '#0B1220' },

@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import type { ColorToken } from '@/lib/style-guide-data';
+import { ColorToken } from '@/lib/types';
 import { useTheme } from '@/components/theme-provider';
 import { Input } from '@/components/ui/input';
 
@@ -15,10 +15,8 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
 
   const handleTextChange = (tokenName: string, theme: 'light' | 'dark', value: string) => {
     // Basic validation for hex code
-    if (/^#([0-9A-F]{3}){1,2}$/i.test(value) || /^rgba?\(.+\)$/i.test(value) || value === 'transparent') {
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(value) || /^rgba?\(.+\)$/i.test(value) || value === 'transparent' || /^#([0-9A-F]{0,6})$/i.test(value) || value === '') {
       onColorChange(tokenName, theme, value);
-    } else if (/^#([0-9A-F]{0,6})$/i.test(value) || value === '') {
-       onColorChange(tokenName, theme, value);
     }
   };
 
