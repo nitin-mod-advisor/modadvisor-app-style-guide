@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Palette, Library, Component, ChevronDown } from 'lucide-react';
+import { Palette, Library, Component as ComponentIcon, ChevronDown, Type, CreditCard, AlertCircle, Table, Square, AppWindow, PanelLeft } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -19,9 +19,18 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
+const components = [
+  { name: 'Buttons', icon: Type, slug: 'buttons' },
+  { name: 'Inputs', icon: Type, slug: 'inputs' },
+  { name: 'Card', icon: CreditCard, slug: 'card' },
+  { name: 'Alerts', icon: AlertCircle, slug: 'alerts' },
+  { name: 'Table', icon: Table, slug: 'table' },
+  { name: 'Modal', icon: Square, slug: 'modal' },
+  { name: 'Sidebar', icon: PanelLeft, slug: 'sidebar' },
+];
 
 function ComponentsSubMenu() {
     const pathname = usePathname();
@@ -38,7 +47,7 @@ function ComponentsSubMenu() {
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger asChild>
                 <SidebarMenuButton>
-                    <Component />
+                    <ComponentIcon />
                     <span>Components</span>
                     <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-180" />
                 </SidebarMenuButton>
@@ -46,12 +55,22 @@ function ComponentsSubMenu() {
             <CollapsibleContent>
                 <SidebarMenuSub>
                     <SidebarMenuSubItem>
-                        <Link href="/components" className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-text-muted hover:bg-surface-2">
-                           <SidebarMenuSubButton isActive={pathname === '/components'}>
+                         <Link href="/components" passHref>
+                            <SidebarMenuSubButton isActive={pathname === '/components'}>
                                 All Components
-                           </SidebarMenuSubButton>
+                            </SidebarMenuSubButton>
                         </Link>
                     </SidebarMenuSubItem>
+                    {components.map((component) => (
+                         <SidebarMenuSubItem key={component.slug}>
+                            <Link href={`/components/${component.slug}`} passHref>
+                                <SidebarMenuSubButton isActive={pathname === `/components/${component.slug}`}>
+                                    <component.icon className="w-4 h-4 mr-2" />
+                                    {component.name}
+                                </SidebarMenuSubButton>
+                            </Link>
+                        </SidebarMenuSubItem>
+                    ))}
                 </SidebarMenuSub>
             </CollapsibleContent>
         </Collapsible>

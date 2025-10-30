@@ -1,19 +1,20 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { INITIAL_TOKENS, type ColorToken } from '@/lib/style-guide-data';
 import { ColorPalette } from '@/components/style-guide/color-palette';
 import { CodePreviews } from '@/components/style-guide/code-previews';
+import { ComponentPreviews } from "@/components/style-guide/component-previews";
 
 export default function Home() {
-  const [tokens, setTokens] = useState<ColorToken[]>(INITIAL_TOKENS);
-  const [isClient, setIsClient] = useState(false);
+  const [tokens, setTokens] = React.useState<ColorToken[]>(INITIAL_TOKENS);
+  const [isClient, setIsClient] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (typeof window === 'undefined' || !isClient) return;
 
     const styleId = 'live-style-guide-variables';
@@ -51,9 +52,14 @@ export default function Home() {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-8 h-screen overflow-y-auto">
-      <ColorPalette tokens={tokens} onColorChange={handleColorChange} />
-      <CodePreviews tokens={tokens} />
+    <div className="grid lg:grid-cols-5 h-screen">
+      <div className="lg:col-span-2 p-4 sm:p-6 lg:p-8 lg:h-screen lg:overflow-y-auto space-y-8">
+        <ColorPalette tokens={tokens} onColorChange={handleColorChange} />
+        <CodePreviews tokens={tokens} />
+      </div>
+      <div className="lg:col-span-3 bg-surface-2 p-4 sm:p-6 lg:p-8 lg:h-screen lg:overflow-y-auto">
+        <ComponentPreviews />
+      </div>
     </div>
   );
 }
