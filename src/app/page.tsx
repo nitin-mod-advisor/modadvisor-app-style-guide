@@ -149,12 +149,14 @@ export default function Home() {
     setIsClient(true);
   }, []);
 
+  // Effect to synchronize Firestore data to local state
   useEffect(() => {
     if (paletteData) {
       setTokens(paletteData.tokens);
     }
   }, [paletteData]);
 
+  // Effect for bootstrapping the initial palette in Firestore
   useEffect(() => {
     if (!isPaletteLoading && !paletteData && paletteRef) {
       const initialPalette: ColorPaletteType = {
@@ -165,6 +167,7 @@ export default function Home() {
     }
   }, [isPaletteLoading, paletteData, paletteRef]);
   
+  // Effect to dynamically update CSS variables in the document head
   useEffect(() => {
     if (typeof window === 'undefined' || !isClient || tokens.length === 0) return;
 
@@ -237,5 +240,3 @@ ${darkVars}
     </div>
   );
 }
-
-    
