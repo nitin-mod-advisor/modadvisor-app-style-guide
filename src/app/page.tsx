@@ -153,12 +153,8 @@ export default function Home() {
   useEffect(() => {
     if (paletteData) {
       setTokens(paletteData.tokens);
-    } else if (!isPaletteLoading) {
-      // If not loading and still no data, it means we should use the initial tokens.
-      // This happens on the very first load before the bootstrap effect runs.
-      setTokens(INITIAL_TOKENS);
     }
-  }, [paletteData, isPaletteLoading]);
+  }, [paletteData]);
 
   // Effect for bootstrapping the initial palette in Firestore
   useEffect(() => {
