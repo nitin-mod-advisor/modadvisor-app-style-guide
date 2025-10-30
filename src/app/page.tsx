@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-import { INITIAL_TOKENS } from '@/lib/style-guide-data';
+//import { INITIAL_TOKENS } from '@/lib/style-guide-data';
 import { ColorPalette } from '@/components/style-guide/color-palette';
 import { CodePreviews } from '@/components/style-guide/code-previews';
 import { type ColorToken, type ColorPalette as ColorPaletteType } from '@/lib/types';
@@ -158,15 +158,15 @@ export default function Home() {
     // This is the critical check:
     // If the hook is done loading AND there is still no data, it means the document
     // does not exist. This is the ONLY time we should create it.
-    else if (!isPaletteLoading && !paletteData && paletteRef) {
-      const initialPalette: ColorPaletteType = {
-        id: PALETTE_ID,
-        tokens: INITIAL_TOKENS,
-      };
-      // We set the local state AND save to Firestore so the UI is in sync.
-      setTokens(initialPalette.tokens);
-      setDocumentNonBlocking(paletteRef, initialPalette, { merge: false });
-    }
+    // else if (!isPaletteLoading && !paletteData && paletteRef) {
+    //   const initialPalette: ColorPaletteType = {
+    //     id: PALETTE_ID,
+    //     tokens: INITIAL_TOKENS,
+    //   };
+    //   // We set the local state AND save to Firestore so the UI is in sync.
+    //   setTokens(initialPalette.tokens);
+    //   setDocumentNonBlocking(paletteRef, initialPalette, { merge: false });
+    // }
   }, [paletteData, isPaletteLoading, paletteRef]);
   
   // Effect to dynamically update CSS variables in the document head
