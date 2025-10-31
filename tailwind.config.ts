@@ -7,6 +7,17 @@ export default {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    {
+      pattern: /^(bg|text|border)-(red|green|blue|indigo|purple|pink|yellow|gray|black|white|orange|teal|cyan|lime|emerald|sky|violet|fuchsia|rose)-(100|200|300|400|500|600|700|800|900)$/,
+    },
+    {
+      pattern: /^(rounded|opacity)-(sm|md|lg|xl|2xl|3xl|full|[0-9]+)$/,
+    },
+    {
+      pattern: /^rounded-\[.*?\]$/,
+    }
+  ],
   theme: {
     extend: {
       fontFamily: {
