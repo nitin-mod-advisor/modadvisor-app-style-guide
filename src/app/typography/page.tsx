@@ -48,12 +48,14 @@ export default function TypographyPage() {
     if (settingsData) {
       setActiveFont(settingsData.fontFamily);
     } else if (!isSettingsLoading && !settingsData && settingsRef) {
-      // If loading is finished and there's no data, create the default setting
+      // If loading is finished and there's no data, create the default setting in Firestore.
+      setActiveFont(DEFAULT_FONT);
       setDocumentNonBlocking(settingsRef, { fontFamily: DEFAULT_FONT }, { merge: false });
     }
   }, [settingsData, isSettingsLoading, settingsRef]);
   
-  // Effect to apply font to the document body
+  // This local effect is for the typography page itself. 
+  // The global font is handled by GlobalFontUpdater in the layout.
   useEffect(() => {
     document.documentElement.style.setProperty('--font-body', activeFont);
   }, [activeFont]);
