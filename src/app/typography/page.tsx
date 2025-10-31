@@ -52,12 +52,12 @@ export default function TypographyPage() {
     // 1. Loading is complete.
     // 2. We have confirmed there is no data.
     // 3. We haven't already tried to set the font locally (to prevent race conditions).
-    if (!isSettingsLoading && !settingsData && settingsRef && activeFont === null) {
-      // Set the default font locally and save it to the database.
-      // This block will only run ONCE when the document doesn't exist.
-      setActiveFont(DEFAULT_FONT);
-      setDocumentNonBlocking(settingsRef, { fontFamily: DEFAULT_FONT }, { merge: false });
-    }
+    // if (!isSettingsLoading && !settingsData && settingsRef && activeFont === null) {
+    //   // Set the default font locally and save it to the database.
+    //   // This block will only run ONCE when the document doesn't exist.
+    //   setActiveFont(DEFAULT_FONT);
+    //   setDocumentNonBlocking(settingsRef, { fontFamily: DEFAULT_FONT }, { merge: false });
+    // }
   }, [settingsData, isSettingsLoading, settingsRef, activeFont]);
   
   // This local effect is for the typography page itself. 
