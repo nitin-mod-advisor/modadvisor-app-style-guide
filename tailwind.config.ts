@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -9,13 +10,19 @@ export default {
   ],
   safelist: [
     {
-      pattern: /^(bg|text|border)-(red|green|blue|indigo|purple|pink|yellow|gray|black|white|orange|teal|cyan|lime|emerald|sky|violet|fuchsia|rose)-(100|200|300|400|500|600|700|800|900)$/,
+      pattern: /^(bg|text|border|ring)-(red|green|blue|indigo|purple|pink|yellow|gray|black|white|orange|teal|cyan|lime|emerald|sky|violet|fuchsia|rose|slate|zinc|neutral|stone)-(100|200|300|400|500|600|700|800|900)$/,
     },
     {
-      pattern: /^(rounded|opacity)-(sm|md|lg|xl|2xl|3xl|full|[0-9]+)$/,
+        pattern: /^(p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|gap|gap-x|gap-y|w|h|min-w|min-h|max-w|max-h|basis|translate-x|translate-y|top|right|bottom|left|inset|inset-x|inset-y|text|rounded|shadow|opacity|border|z)-.+$/,
     },
     {
-      pattern: /^rounded-\[.*?\]$/,
+        pattern: /^(flex|grid|hidden|block|inline|inline-block|absolute|relative|static|fixed|sticky)$/,
+    },
+    {
+      pattern: /^(rounded|opacity|shadow)-(sm|md|lg|xl|2xl|3xl|full|inner|none|[0-9]+)$/,
+    },
+    {
+      pattern: /rounded-\[(1|2|4|8|12|16|20|24|32|40|48|56|64)px\]/,
     }
   ],
   theme: {
