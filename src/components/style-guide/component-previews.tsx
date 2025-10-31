@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import React, { useState } from 'react';
@@ -229,7 +230,7 @@ const AccordionPreview = () => {
     const [collapsible, setCollapsible] = useState(true);
     const [className, setClassName] = useState('');
 
-    const code = `<Accordion type="${type}" ${collapsible && type === 'single' ? 'collapsible' : ''} className={cn("w-full", "${className}")}>
+    const code = `<Accordion type="${type}" ${collapsible && type === 'single' ? 'collapsible' : ''} className={cn("w-full", "${className.replace(/,/g, ' ')}")}>
     <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
         <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
@@ -266,7 +267,7 @@ const AccordionPreview = () => {
                         <Label htmlFor="accordion-classname">ClassName</Label>
                         <Input 
                             id="accordion-classname"
-                            placeholder="e.g. bg-blue-500"
+                            placeholder="e.g. bg-blue-500, text-white"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -274,7 +275,7 @@ const AccordionPreview = () => {
                 </>
             }
         >
-            <Accordion type={type} collapsible={type === 'single' ? collapsible : undefined} className={cn("w-full max-w-md", className)}>
+            <Accordion type={type} collapsible={type === 'single' ? collapsible : undefined} className={cn("w-full max-w-md", className.replace(/,/g, ' '))}>
                 <AccordionItem value="item-1">
                     <AccordionTrigger>Is it accessible?</AccordionTrigger>
                     <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
@@ -301,7 +302,7 @@ const AlertPreview = () => {
         warning: <AlertTriangle className="h-4 w-4" />,
     }
 
-    const code = `<Alert variant="${variant}" className={cn("${className}")}>
+    const code = `<Alert variant="${variant}" className={cn("${className.replace(/,/g, ' ')}")}>
     ${{
         default: '<Info className="h-4 w-4" />',
         destructive: '<XCircle className="h-4 w-4" />',
@@ -344,7 +345,7 @@ const AlertPreview = () => {
                         <Label htmlFor="alert-classname">ClassName</Label>
                         <Input 
                             id="alert-classname"
-                            placeholder="e.g. border-blue-500"
+                            placeholder="e.g. border-blue-500, text-lg"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -353,7 +354,7 @@ const AlertPreview = () => {
             }
         >
             <div className="w-full max-w-md space-y-4">
-                <Alert variant={variant} className={cn(className)}>
+                <Alert variant={variant} className={cn(className.replace(/,/g, ' '))}>
                     {alertIcons[variant]}
                     <AlertTitle>{title}</AlertTitle>
                     <AlertDescription>{description}</AlertDescription>
@@ -413,7 +414,7 @@ const AvatarPreview = () => {
     const [fallback, setFallback] = useState('CN');
     const [className, setClassName] = useState('');
 
-    const code = `<Avatar className={cn("${className}")}>
+    const code = `<Avatar className={cn("${className.replace(/,/g, ' ')}")}>
     <AvatarImage src="https://picsum.photos/seed/${seed}/100/100" alt="@shadcn" />
     <AvatarFallback>${fallback}</AvatarFallback>
 </Avatar>`;
@@ -436,7 +437,7 @@ const AvatarPreview = () => {
                         <Label htmlFor="avatar-classname">ClassName</Label>
                         <Input 
                             id="avatar-classname"
-                            placeholder="e.g. w-20 h-20"
+                            placeholder="e.g. w-20, h-20"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -444,7 +445,7 @@ const AvatarPreview = () => {
                 </>
             }
         >
-            <Avatar className={cn(className)}>
+            <Avatar className={cn(className.replace(/,/g, ' '))}>
                 <AvatarImage src={`https://picsum.photos/seed/${seed}/100/100`} alt="@shadcn" />
                 <AvatarFallback>{fallback}</AvatarFallback>
             </Avatar>
@@ -457,7 +458,7 @@ const BadgePreview = () => {
     const [text, setText] = useState('Badge');
     const [className, setClassName] = useState('');
     
-    const code = `<Badge variant="${variant}" className={cn("${className}")}>${text}</Badge>`;
+    const code = `<Badge variant="${variant}" className={cn("${className.replace(/,/g, ' ')}")}>${text}</Badge>`;
 
     return (
         <DynamicPreviewContainer 
@@ -487,7 +488,7 @@ const BadgePreview = () => {
                         <Label htmlFor="badge-classname">ClassName</Label>
                         <Input 
                             id="badge-classname"
-                            placeholder="e.g. text-lg"
+                            placeholder="e.g. text-lg, py-2"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -495,7 +496,7 @@ const BadgePreview = () => {
                 </>
             }
         >
-            <Badge variant={variant} className={cn(className)}>{text}</Badge>
+            <Badge variant={variant} className={cn(className.replace(/,/g, ' '))}>{text}</Badge>
         </DynamicPreviewContainer>
     );
 }
@@ -506,7 +507,7 @@ const ButtonPreview = () => {
     const [size, setSize] = useState<'default' | 'sm' | 'lg' | 'icon'>('default');
     const [text, setText] = useState('Dynamic Button');
 
-    const code = `<Button variant="${variant}" size="${size}" className={cn("${className}")}>\n  ${text}\n</Button>`;
+    const code = `<Button variant="${variant}" size="${size}" className={cn("${className.replace(/,/g, ' ')}")}>\n  ${text}\n</Button>`;
 
     return (
         <DynamicPreviewContainer
@@ -552,7 +553,7 @@ const ButtonPreview = () => {
                         <Label htmlFor="button-classname">ClassName</Label>
                         <Input 
                             id="button-classname"
-                            placeholder="e.g. bg-blue-500 hover:bg-blue-600"
+                            placeholder="e.g. bg-blue-500, hover:bg-blue-600"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -560,7 +561,7 @@ const ButtonPreview = () => {
                 </>
             }
         >
-            <Button variant={variant} size={size} className={cn(className)}>
+            <Button variant={variant} size={size} className={cn(className.replace(/,/g, ' '))}>
                 {size === 'icon' ? <Plus/> : text}
             </Button>
         </DynamicPreviewContainer>
@@ -749,7 +750,7 @@ const CheckboxPreview = () => {
     const [className, setClassName] = useState('');
 
     const code = `<div className="flex items-center space-x-2">
-    <Checkbox id="terms" checked={${checked}}${disabled ? ' disabled' : ''} className={cn("${className}")} />
+    <Checkbox id="terms" checked={${checked}}${disabled ? ' disabled' : ''} className={cn("${className.replace(/,/g, ' ')}")} />
     <label
         htmlFor="terms"
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -780,7 +781,7 @@ const CheckboxPreview = () => {
                         <Label htmlFor="checkbox-classname">ClassName</Label>
                         <Input 
                             id="checkbox-classname"
-                            placeholder="e.g. h-6 w-6"
+                            placeholder="e.g. h-6, w-6"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -789,7 +790,7 @@ const CheckboxPreview = () => {
             }
         >
             <div className="flex items-center space-x-2">
-                <Checkbox id="terms" checked={checked} onCheckedChange={setChecked} disabled={disabled} className={cn(className)} />
+                <Checkbox id="terms" checked={checked} onCheckedChange={setChecked} disabled={disabled} className={cn(className.replace(/,/g, ' '))} />
                 <label
                     htmlFor="terms"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -1095,7 +1096,7 @@ const InputPreview = () => {
     const [type, setType] = useState('text');
     const [className, setClassName] = useState('');
 
-    const code = `<Input type="${type}" placeholder="${placeholder}" ${disabled ? 'disabled ' : ''} className={cn("${className}")} />`;
+    const code = `<Input type="${type}" placeholder="${placeholder}" ${disabled ? 'disabled ' : ''} className={cn("${className.replace(/,/g, ' ')}")} />`;
 
     return (
         <DynamicPreviewContainer 
@@ -1130,7 +1131,7 @@ const InputPreview = () => {
                         <Label htmlFor="input-classname">ClassName</Label>
                         <Input 
                             id="input-classname"
-                            placeholder="e.g. border-blue-500"
+                            placeholder="e.g. border-blue-500, text-lg"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -1139,7 +1140,7 @@ const InputPreview = () => {
             }
         >
             <div className="w-full max-w-sm">
-                <Input type={type} placeholder={placeholder} disabled={disabled} className={cn(className)} />
+                <Input type={type} placeholder={placeholder} disabled={disabled} className={cn(className.replace(/,/g, ' '))} />
             </div>
         </DynamicPreviewContainer>
     );
@@ -1236,7 +1237,7 @@ const ProgressPreview = () => {
     const [progress, setProgress] = React.useState(66)
     const [className, setClassName] = useState('');
     
-    const code = `<Progress value={${progress}} className={cn("w-[60%]", "${className}")} />`;
+    const code = `<Progress value={${progress}} className={cn("w-[60%]", "${className.replace(/,/g, ' ')}")} />`;
     
     return (
          <DynamicPreviewContainer 
@@ -1260,7 +1261,7 @@ const ProgressPreview = () => {
                 </>
             }
         >
-            <Progress value={progress} className={cn("w-[60%]", className)} />
+            <Progress value={progress} className={cn("w-[60%]", className.replace(/,/g, ' '))} />
         </DynamicPreviewContainer>
     )
 };
@@ -1368,14 +1369,14 @@ const SeparatorPreview = () => {
         <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
         <p className="text-sm text-muted-foreground">An open-source UI component library.</p>
     </div>
-    <Separator className={cn("my-4", "${className}")} />
+    <Separator className={cn("my-4", "${className.replace(/,/g, ' ')}")} />
     ...
 </div>` : `
 <div className="flex h-5 items-center space-x-4 text-sm">
     <div>Blog</div>
-    <Separator orientation="vertical" className={cn("${className}")} />
+    <Separator orientation="vertical" className={cn("${className.replace(/,/g, ' ')}")} />
     <div>Docs</div>
-    <Separator orientation="vertical" className={cn("${className}")} />
+    <Separator orientation="vertical" className={cn("${className.replace(/,/g, ' ')}")} />
     <div>Source</div>
 </div>`;
 
@@ -1401,7 +1402,7 @@ const SeparatorPreview = () => {
                         <Label htmlFor="separator-classname">ClassName</Label>
                         <Input 
                             id="separator-classname"
-                            placeholder="e.g. bg-primary"
+                            placeholder="e.g. bg-primary, h-1"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -1416,21 +1417,21 @@ const SeparatorPreview = () => {
                             <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
                             <p className="text-sm text-muted-foreground">An open-source UI component library.</p>
                         </div>
-                        <Separator className={cn("my-4", className)} />
+                        <Separator className={cn("my-4", className.replace(/,/g, ' '))} />
                         <div className="flex h-5 items-center space-x-4 text-sm">
                             <div>Blog</div>
-                            <Separator orientation="vertical" className={cn(className)} />
+                            <Separator orientation="vertical" className={cn(className.replace(/,/g, ' '))} />
                             <div>Docs</div>
-                            <Separator orientation="vertical" className={cn(className)} />
+                            <Separator orientation="vertical" className={cn(className.replace(/,/g, ' '))} />
                             <div>Source</div>
                         </div>
                     </>
                 ) : (
                     <div className="flex h-5 items-center space-x-4 text-sm">
                         <div>Blog</div>
-                        <Separator orientation="vertical" className={cn(className)} />
+                        <Separator orientation="vertical" className={cn(className.replace(/,/g, ' '))} />
                         <div>Docs</div>
-                        <Separator orientation="vertical" className={cn(className)} />
+                        <Separator orientation="vertical" className={cn(className.replace(/,/g, ' '))} />
                         <div>Source</div>
                     </div>
                 )}
@@ -1518,7 +1519,7 @@ const SliderPreview = () => {
     const [step, setStep] = useState(1);
     const [className, setClassName] = useState('');
 
-    const code = `<Slider defaultValue={[${value}]} max={100} step={${step}} className={cn("w-[60%]", "${className}")} />`;
+    const code = `<Slider defaultValue={[${value}]} max={100} step={${step}} className={cn("w-[60%]", "${className.replace(/,/g, ' ')}")} />`;
 
     return (
         <DynamicPreviewContainer 
@@ -1546,7 +1547,7 @@ const SliderPreview = () => {
                 </>
             }
         >
-            <Slider defaultValue={[value]} max={100} step={step} onValueChange={(v) => setValue(v[0])} className={cn("w-[60%]", className)} />
+            <Slider defaultValue={[value]} max={100} step={step} onValueChange={(v) => setValue(v[0])} className={cn("w-[60%]", className.replace(/,/g, ' '))} />
         </DynamicPreviewContainer>
     );
 };
@@ -1557,7 +1558,7 @@ const SwitchPreview = () => {
     const [className, setClassName] = useState('');
 
     const code = `<div className="flex items-center space-x-2">
-    <Switch id="airplane-mode" checked={${checked}}${disabled ? ' disabled' : ''} className={cn("${className}")} />
+    <Switch id="airplane-mode" checked={${checked}}${disabled ? ' disabled' : ''} className={cn("${className.replace(/,/g, ' ')}")} />
     <Label htmlFor="airplane-mode">Airplane Mode</Label>
 </div>`;
 
@@ -1588,7 +1589,7 @@ const SwitchPreview = () => {
             }
         >
             <div className="flex items-center space-x-2">
-                <Switch id="airplane-mode" checked={checked} onCheckedChange={(c) => setChecked(c)} disabled={disabled} className={cn(className)} />
+                <Switch id="airplane-mode" checked={checked} onCheckedChange={(c) => setChecked(c)} disabled={disabled} className={cn(className.replace(/,/g, ' '))} />
                 <Label htmlFor="airplane-mode">Airplane Mode</Label>
             </div>
         </DynamicPreviewContainer>
@@ -1738,7 +1739,7 @@ const TextareaPreview = () => {
     const [disabled, setDisabled] = useState(false);
     const [className, setClassName] = useState('');
 
-    const code = `<Textarea placeholder="${placeholder}" ${disabled ? 'disabled ' : ''}className={cn("max-w-sm", "${className}")}/>`;
+    const code = `<Textarea placeholder="${placeholder}" ${disabled ? 'disabled ' : ''}className={cn("max-w-sm", "${className.replace(/,/g, ' ')}")} />`;
     
     return (
         <DynamicPreviewContainer 
@@ -1758,7 +1759,7 @@ const TextareaPreview = () => {
                         <Label htmlFor="textarea-classname">ClassName</Label>
                         <Input 
                             id="textarea-classname"
-                            placeholder="e.g. resize-none"
+                            placeholder="e.g. resize-none, h-40"
                             value={className}
                             onChange={(e) => setClassName(e.target.value)}
                         />
@@ -1766,7 +1767,7 @@ const TextareaPreview = () => {
                 </>
             }
         >
-            <Textarea placeholder={placeholder} disabled={disabled} className={cn("max-w-sm", className)}/>
+            <Textarea placeholder={placeholder} disabled={disabled} className={cn("max-w-sm", className.replace(/,/g, ' '))} />
         </DynamicPreviewContainer>
     );
 };
