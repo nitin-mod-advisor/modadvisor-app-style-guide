@@ -9,3 +9,7 @@ export type ColorPalette = {
   id: string;
   tokens: ColorToken[];
 };
+
+export type TypographySettings = {
+  fontFamily: string;
+};

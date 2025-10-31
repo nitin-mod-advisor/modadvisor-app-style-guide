@@ -34,6 +34,19 @@
         }
       },
       "required": ["id", "tokens"]
+    },
+    "TypographySettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TypographySettings",
+      "type": "object",
+      "description": "Stores the application's typography settings.",
+      "properties": {
+        "fontFamily": {
+          "type": "string",
+          "description": "The CSS font-family string for the application body."
+        }
+      },
+      "required": ["fontFamily"]
     }
   },
   "auth": {
@@ -51,6 +64,16 @@
             "$ref": "#/backend/entities/ColorPalette"
           },
           "description": "Stores individual color palettes."
+        }
+      },
+      {
+        "path": "/settings/typography",
+        "definition": {
+          "entityName": "TypographySettings",
+          "schema": {
+            "$ref": "#/backend/entities/TypographySettings"
+          },
+          "description": "Stores global typography settings. This is a single-document path."
         }
       }
     ]

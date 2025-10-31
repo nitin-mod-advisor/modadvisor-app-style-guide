@@ -2,6 +2,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { doc } from 'firebase/firestore';
+import { useFirestore, useDoc, useMemoFirebase, setDocumentNonBlocking } from '@/firebase';
 import {
   Select,
   SelectContent,
@@ -10,6 +12,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const TYPOGRAPHY_SETTINGS_ID = "typography";
+const SETTINGS_COLLECTION = "settings";
+const DEFAULT_FONT = "'Inter', sans-serif";
+
+type TypographySettings = {
+  fontFamily: string;
+};
 
 const fonts = [
   { name: 'Inter', family: "'Inter', sans-serif" },
@@ -23,27 +33,48 @@ const fonts = [
 ];
 
 export default function TypographyPage() {
-  const [activeFont, setActiveFont] = useState("'Inter', sans-serif");
-  const [isClient, setIsClient] = useState(false);
+  const [activeFont, setActiveFont] = useState(DEFAULT_FONT);
+  const firestore = useFirestore();
 
-  useEffect(() => {
-    setIsClient(true);
-    // Load saved font from local storage if it exists
-    const savedFont = localStorage.getItem('global-font');
-    if (savedFont) {
-      setActiveFont(savedFont);
-    }
-  }, []);
+  const settingsRef = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return doc(firestore, SETTINGS_COLLECTION, TYPOGRAPHY_SETTINGS_ID);
+  }, [firestore]);
 
+  const { data: settingsData, isLoading: isSettingsLoading } = useDoc<TypographySettings>(settingsRef);
+
+  // Effect to apply font from database or set initial default
   useEffect(() => {
-    if (isClient) {
-      document.documentElement.style.setProperty('--font-body', activeFont);
-      localStorage.setItem('global-font', activeFont);
+    if (settingsData) {
+      setActiveFont(settingsData.fontFamily);
+    } else if (!isSettingsLoading && !settingsData && settingsRef) {
+      // If loading is finished and there's no data, create the default setting
+      setDocumentNonBlocking(settingsRef, { fontFamily: DEFAULT_FONT }, { merge: false });
     }
-  }, [activeFont, isClient]);
+  }, [settingsData, isSettingsLoading, settingsRef]);
+  
+  // Effect to apply font to the document body
+  useEffect(() => {
+    document.documentElement.style.setProperty('--font-body', activeFont);
+  }, [activeFont]);
+
+  const handleFontChange = (fontFamily: string) => {
+    setActiveFont(fontFamily);
+    if (settingsRef) {
+      setDocumentNonBlocking(settingsRef, { fontFamily }, { merge: true });
+    }
+  };
 
   const getFontFamilyName = (fontFamily: string) => {
     return fontFamily.split(',')[0].replace(/'/g, '');
+  };
+
+  if (isSettingsLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+          <p>Loading typography settings...</p>
+      </div>
+    );
   }
 
   return (
@@ -55,9 +86,9 @@ export default function TypographyPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            Select a font to apply it to the entire application. The change is saved locally.
+            Select a font to apply it to the entire application. The change is saved to the database.
           </p>
-          <Select value={activeFont} onValueChange={setActiveFont}>
+          <Select value={activeFont} onValueChange={handleFontChange}>
             <SelectTrigger className="w-full max-w-xs">
               <SelectValue placeholder="Select a font">
                 {getFontFamilyName(activeFont)}
