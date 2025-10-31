@@ -289,13 +289,25 @@ const AccordionPreview = () => {
 }
 
 const AlertPreview = () => {
-    const [variant, setVariant] = useState<'default' | 'destructive'>('default');
+    const [variant, setVariant] = useState<'default' | 'destructive' | 'success' | 'warning'>('default');
     const [title, setTitle] = useState('Heads up!');
     const [description, setDescription] = useState('This is an informational message.');
     const [className, setClassName] = useState('');
 
+    const alertIcons = {
+        default: <Info className="h-4 w-4" />,
+        destructive: <XCircle className="h-4 w-4" />,
+        success: <CheckCircle className="h-4 w-4" />,
+        warning: <AlertTriangle className="h-4 w-4" />,
+    }
+
     const code = `<Alert variant="${variant}" className={cn("${className}")}>
-    <${variant === 'destructive' ? 'XCircle' : 'Info'} className="h-4 w-4" />
+    ${{
+        default: '<Info className="h-4 w-4" />',
+        destructive: '<XCircle className="h-4 w-4" />',
+        success: '<CheckCircle className="h-4 w-4" />',
+        warning: '<AlertTriangle className="h-4 w-4" />',
+    }[variant]}
     <AlertTitle>${title}</AlertTitle>
     <AlertDescription>${description}</AlertDescription>
 </Alert>`;
@@ -315,6 +327,8 @@ const AlertPreview = () => {
                             <SelectContent>
                                 <SelectItem value="default">Default</SelectItem>
                                 <SelectItem value="destructive">Destructive</SelectItem>
+                                <SelectItem value="success">Success</SelectItem>
+                                <SelectItem value="warning">Warning</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -340,7 +354,7 @@ const AlertPreview = () => {
         >
             <div className="w-full max-w-md space-y-4">
                 <Alert variant={variant} className={cn(className)}>
-                    {variant === 'destructive' ? <XCircle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
+                    {alertIcons[variant]}
                     <AlertTitle>{title}</AlertTitle>
                     <AlertDescription>{description}</AlertDescription>
                 </Alert>
