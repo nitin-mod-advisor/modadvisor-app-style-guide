@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { CheckCircle, Info, AlertTriangle, XCircle, Home, Settings, Calendar as CalendarIcon, Plus, User } from 'lucide-react';
+import { CheckCircle, Info, AlertTriangle, XCircle, Home, Settings, Calendar as CalendarIcon, Plus, User, Type } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -87,6 +87,7 @@ export function ComponentPreviews({ componentToShow }: ComponentPreviewsProps) {
       <ToastPreview />
       <TooltipPreview />
       <SidebarHeaderPreview />
+      <TypographyPreview />
     </>
   );
 
@@ -127,6 +128,7 @@ export function ComponentPreviews({ componentToShow }: ComponentPreviewsProps) {
       case 'toast': return <ToastPreview />;
       case 'tooltip': return <TooltipPreview />;
       case 'sidebar': return <SidebarHeaderPreview />;
+      case 'typography': return <TypographyPreview />;
       default: return allComponents;
     }
   };
@@ -1866,6 +1868,43 @@ const SidebarHeaderPreview = () => (
                     <p className="text-muted-foreground text-sm">Main content area</p>
                 </main>
             </div>
+        </div>
+    </PreviewContainer>
+);
+
+const TypographyPreview = () => (
+    <PreviewContainer
+        title="Typography"
+        code={`
+<div className="prose dark:prose-invert">
+    <h1>Heading 1</h1>
+    <h2>Heading 2</h2>
+    <h3>Heading 3</h3>
+    <p>This is a paragraph of text. It's useful for long-form content.</p>
+    <blockquote>This is a blockquote.</blockquote>
+    <code>This is inline code.</code>
+</div>
+        `}
+    >
+        <div className="w-full max-w-2xl prose dark:prose-invert">
+            <h1>Aa - Heading 1</h1>
+            <h2>Bb - Heading 2</h2>
+            <h3>Cc - Heading 3</h3>
+            <h4>Dd - Heading 4</h4>
+            <p>
+                The quick brown fox jumps over the lazy dog. This is a paragraph. It is used for long-form content and descriptions. Paired with beautiful typography, it can make your application a joy to read.
+            </p>
+            <blockquote>
+                "The only way to do great work is to love what you do." - A wise person
+            </blockquote>
+            <ul>
+                <li>List item one</li>
+                <li>List item two</li>
+                <li>List item three</li>
+            </ul>
+             <p>
+                This is a paragraph with <code>inline code</code> and a <a href="#">link</a>.
+            </p>
         </div>
     </PreviewContainer>
 );

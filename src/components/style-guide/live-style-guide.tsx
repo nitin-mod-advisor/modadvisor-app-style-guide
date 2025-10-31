@@ -63,6 +63,7 @@ const components = [
     { name: 'Toast', icon: MessageSquare, slug: 'toast' },
     { name: 'Tooltip', icon: MousePointer, slug: 'tooltip' },
     { name: 'Sidebar', icon: PanelLeft, slug: 'sidebar' },
+    { name: 'Typography', icon: Type, slug: 'typography' },
 ];
 
 
@@ -137,6 +138,14 @@ export default function LiveStyleGuide({
                 <SidebarMenuButton isActive={pathname === '/'}>
                   <Palette />
                   <span>Color Palette</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <Link href="/typography">
+                <SidebarMenuButton isActive={pathname === '/typography'}>
+                  <Type />
+                  <span>Typography</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
