@@ -12,14 +12,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TypographySettings } from '@/lib/types';
 
 const TYPOGRAPHY_SETTINGS_ID = "typography";
 const SETTINGS_COLLECTION = "settings";
 const DEFAULT_FONT = "'Inter', sans-serif";
-
-type TypographySettings = {
-  fontFamily: string;
-};
 
 const fonts = [
   { name: 'Inter', family: "'Inter', sans-serif" },
@@ -33,7 +30,7 @@ const fonts = [
 ];
 
 export default function TypographyPage() {
-  const [activeFont, setActiveFont] = useState(DEFAULT_FONT);
+  const [activeFont, setActiveFont] = useState<string | null>(null);
   const firestore = useFirestore();
 
   const settingsRef = useMemoFirebase(() => {
@@ -43,21 +40,32 @@ export default function TypographyPage() {
 
   const { data: settingsData, isLoading: isSettingsLoading } = useDoc<TypographySettings>(settingsRef);
 
-  // Effect to apply font from database or set initial default
+  // This is the corrected effect to handle initial data loading and persistence.
   useEffect(() => {
+    // If we have data from Firestore, it is the source of truth.
     if (settingsData) {
       setActiveFont(settingsData.fontFamily);
-    } else if (!isSettingsLoading && !settingsData && settingsRef) {
-      // If loading is finished and there's no data, create the default setting in Firestore.
+      return;
+    }
+    
+    // This is the critical check. We only write the default if:
+    // 1. Loading is complete.
+    // 2. We have confirmed there is no data.
+    // 3. We haven't already tried to set the font locally (to prevent race conditions).
+    if (!isSettingsLoading && !settingsData && settingsRef && activeFont === null) {
+      // Set the default font locally and save it to the database.
+      // This block will only run ONCE when the document doesn't exist.
       setActiveFont(DEFAULT_FONT);
       setDocumentNonBlocking(settingsRef, { fontFamily: DEFAULT_FONT }, { merge: false });
     }
-  }, [settingsData, isSettingsLoading, settingsRef]);
+  }, [settingsData, isSettingsLoading, settingsRef, activeFont]);
   
   // This local effect is for the typography page itself. 
   // The global font is handled by GlobalFontUpdater in the layout.
   useEffect(() => {
-    document.documentElement.style.setProperty('--font-body', activeFont);
+    if (activeFont) {
+        document.documentElement.style.setProperty('--font-body', activeFont);
+    }
   }, [activeFont]);
 
   const handleFontChange = (fontFamily: string) => {
@@ -67,11 +75,12 @@ export default function TypographyPage() {
     }
   };
 
-  const getFontFamilyName = (fontFamily: string) => {
+  const getFontFamilyName = (fontFamily: string | null) => {
+    if (!fontFamily) return '';
     return fontFamily.split(',')[0].replace(/'/g, '');
   };
 
-  if (isSettingsLoading) {
+  if (isSettingsLoading && !settingsData) {
     return (
       <div className="flex items-center justify-center h-screen">
           <p>Loading typography settings...</p>
@@ -90,7 +99,7 @@ export default function TypographyPage() {
           <p className="text-muted-foreground">
             Select a font to apply it to the entire application. The change is saved to the database.
           </p>
-          <Select value={activeFont} onValueChange={handleFontChange}>
+          <Select value={activeFont ?? ''} onValueChange={handleFontChange}>
             <SelectTrigger className="w-full max-w-xs">
               <SelectValue placeholder="Select a font">
                 {getFontFamilyName(activeFont)}
