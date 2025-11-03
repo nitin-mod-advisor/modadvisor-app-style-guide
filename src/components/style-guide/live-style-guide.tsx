@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import React from 'react';
@@ -8,7 +9,7 @@ import {
     Palette, Library, Component as ComponentIcon, ChevronDown, Type, CreditCard, AlertCircle, Table, Square, AppWindow, PanelLeft,
     CircleAlert, User as AvatarIcon, Badge, Calendar, CheckSquare, Bold, GitBranch, LayoutGrid, Menu,
     Pipette, Pointer, Ratio, Rows, VenetianMask, Sliders, ToggleRight, ListTree, MousePointer, MessageSquare, PanelTop,
-    BarChart2, Shell, Framer, AreaChart
+    BarChart2, Shell, Framer, AreaChart, Wand2
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -152,6 +153,14 @@ export default function LiveStyleGuide({
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <ComponentsSubMenu />
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <Link href="/layout-creator">
+                <SidebarMenuButton isActive={pathname === '/layout-creator'}>
+                  <Wand2 />
+                  <span>Create Layout</span>
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
