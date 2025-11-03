@@ -272,22 +272,17 @@ export default function LayoutCreatorPage() {
                               Copy the code below to use in your project.
                           </DialogDescription>
                         </DialogHeader>
-                        <div className="relative flex-1">
-                           <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute top-2 right-2 h-8 w-8"
-                              onClick={handleCopyCode}
-                            >
-                              <Clipboard className="h-4 w-4" />
-                              <span className="sr-only">Copy Code</span>
+                        <ScrollArea className="h-full rounded-md bg-muted border">
+                            <pre className="text-sm p-4 overflow-x-auto">
+                                <code>{lastAiResponse.content}</code>
+                            </pre>
+                        </ScrollArea>
+                        <DialogFooter>
+                            <Button onClick={handleCopyCode}>
+                                <Clipboard className="mr-2 h-4 w-4" />
+                                Copy Code
                             </Button>
-                          <ScrollArea className="h-full rounded-md bg-muted p-4">
-                              <pre className="text-sm">
-                                  <code>{lastAiResponse.content}</code>
-                              </pre>
-                          </ScrollArea>
-                        </div>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
               )}
@@ -322,5 +317,3 @@ export default function LayoutCreatorPage() {
     </div>
   );
 }
-
-    
