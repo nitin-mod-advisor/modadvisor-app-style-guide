@@ -12,6 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateLayoutInputSchema = z.object({
+  history: z.array(z.any()).describe('The conversation history.'),
   prompt: z.string().describe('The user prompt describing the desired layout.'),
 });
 export type GenerateLayoutInput = z.infer<typeof GenerateLayoutInputSchema>;
@@ -58,7 +59,7 @@ const prompt = ai.definePrompt({
   name: 'generateLayoutPrompt',
   input: { schema: GenerateLayoutInputSchema },
   output: { schema: GenerateLayoutOutputSchema },
-  prompt: `You are an expert UI developer specializing in React, Tailwind CSS, and ShadCN UI components. Your task is to generate a single, production-quality block of JSX code based on a user's prompt.
+  prompt: `You are an expert UI developer specializing in React, Tailwind CSS, and ShadCN UI components. Your task is to generate a single, production-quality block of JSX code based on a user's prompt. You will be given the conversation history, and the current user prompt.
 
   RULES:
   - You MUST return only raw, valid JSX code.
@@ -76,7 +77,12 @@ const prompt = ai.definePrompt({
   ${componentExamples}
   ---
   
-  User Prompt:
+  CONVERSATION HISTORY:
+  {{#each history}}
+    **{{role}}**: {{#each (lookup content 0)}} {{{this}}} {{/each}}
+  {{/each}}
+  
+  USER PROMPT:
   {{{prompt}}}
   `,
 });

@@ -5,7 +5,7 @@ import React, { useState, useMemo } from 'react';
 import * as Babel from '@babel/standalone';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, History } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,10 +16,17 @@ import { generateLayout } from '@/ai/flows/generate-layout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+
 
 const formSchema = z.object({
   prompt: z.string().min(1, { message: 'Prompt cannot be empty.' }),
 });
+
+type Message = {
+    role: 'user' | 'model';
+    content: string;
+};
 
 // Create a scope of all available components for the renderer
 const componentScope = {
@@ -33,7 +40,8 @@ const componentScope = {
   CardContent,
   CardFooter,
   Label,
-  Plus
+  Plus,
+  History
   // Add any other components you want the AI to be able to use here
 };
 
@@ -66,7 +74,7 @@ const DynamicComponent = ({ jsx }: { jsx: string }) => {
 
 
 export default function LayoutCreatorPage() {
-  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,23 +85,45 @@ export default function LayoutCreatorPage() {
     },
   });
 
+  const lastAiResponse = messages.filter(m => m.role === 'model').pop();
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setGeneratedContent(null);
     setError(null);
+    
+    const newMessages: Message[] = [
+        ...messages,
+        { role: 'user', content: values.prompt }
+    ];
+    setMessages(newMessages);
+
     try {
-      const result = await generateLayout({ prompt: values.prompt });
-      setGeneratedContent(result.jsx);
+      // The history needs to be in a slightly different format for the AI
+      const historyForAI = newMessages.map(m => ({
+          role: m.role,
+          content: [{ text: m.content }]
+      }));
+
+      const result = await generateLayout({ 
+          history: historyForAI,
+          prompt: values.prompt 
+      });
+      
+      setMessages(prev => [...prev, { role: 'model', content: result.jsx }]);
+      form.reset();
+
     } catch (e: any) {
       console.error(e);
       setError(e.message || 'An error occurred while generating the layout. Please try again.');
+      // remove the user message if the AI fails
+       setMessages(prev => prev.slice(0, prev.length -1));
     } finally {
       setIsLoading(false);
     }
   }
 
   const displayContent = () => {
-    if (isLoading) {
+    if (isLoading && !lastAiResponse) {
         return (
             <div className="flex flex-col items-center justify-center text-muted-foreground">
                 <Loader2 className="h-8 w-8 animate-spin mb-2" />
@@ -104,10 +134,15 @@ export default function LayoutCreatorPage() {
     if (error) {
         return <p className="text-destructive-foreground bg-destructive/20 p-4 rounded-md">{error}</p>
     }
-    if (generatedContent) {
+    if (lastAiResponse) {
         return (
-          <div className="w-full h-full flex items-center justify-center">
-            <DynamicComponent jsx={generatedContent} />
+          <div className="w-full h-full flex items-center justify-center relative">
+             {isLoading && (
+                <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-10">
+                     <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+            )}
+            <DynamicComponent jsx={lastAiResponse.content} />
           </div>
         );
     }
@@ -118,7 +153,7 @@ export default function LayoutCreatorPage() {
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       <div className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
         <h2 className="text-2xl font-bold mb-4">Create Layout with AI</h2>
-        <div className="w-full h-full min-h-[50vh] rounded-lg border border-dashed border-border bg-card flex items-center justify-center p-4">
+        <div className="w-full h-full min-h-[50vh] rounded-lg border border-dashed border-border bg-card flex items-center justify-center p-4 relative">
           {displayContent()}
         </div>
       </div>
@@ -148,6 +183,26 @@ export default function LayoutCreatorPage() {
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 <span className="sr-only">Send</span>
               </Button>
+              <Sheet>
+                <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" disabled={isLoading || messages.length === 0}>
+                        <History className="h-4 w-4" />
+                        <span className="sr-only">View History</span>
+                    </Button>
+                </SheetTrigger>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle>Prompt History</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-4 space-y-4">
+                        {messages.filter(m => m.role === 'user').map((message, index) => (
+                            <div key={index} className="p-3 bg-muted rounded-md text-sm">
+                                {message.content}
+                            </div>
+                        ))}
+                    </div>
+                </SheetContent>
+              </Sheet>
             </form>
           </Form>
         </div>
