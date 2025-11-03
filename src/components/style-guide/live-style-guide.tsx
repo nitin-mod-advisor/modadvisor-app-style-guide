@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react';
@@ -145,7 +146,7 @@ export default function LiveStyleGuide({
               <Link href="/typography">
                 <SidebarMenuButton isActive={pathname === '/typography'}>
                   <Type />
-                  <span>Typography</span>
+                  <span>Fonts</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
