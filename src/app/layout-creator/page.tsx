@@ -272,8 +272,8 @@ export default function LayoutCreatorPage() {
                               Copy the code below to use in your project.
                           </DialogDescription>
                         </DialogHeader>
-                        <ScrollArea className="h-full rounded-md bg-muted border p-4">
-                            <pre className="text-sm">
+                        <ScrollArea className="h-full rounded-md bg-muted border">
+                            <pre className="text-sm p-4 whitespace-pre-wrap break-words">
                                 <code>{lastAiResponse.content}</code>
                             </pre>
                             <ScrollBar orientation="horizontal" />
