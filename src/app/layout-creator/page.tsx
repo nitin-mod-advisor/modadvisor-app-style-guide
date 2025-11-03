@@ -32,7 +32,7 @@ import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, Me
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -82,7 +82,7 @@ const componentScope = {
   Popover, PopoverContent, PopoverTrigger,
   Progress,
   RadioGroup, RadioGroupItem,
-  ScrollArea,
+  ScrollArea, ScrollBar,
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
   Separator,
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
@@ -272,10 +272,11 @@ export default function LayoutCreatorPage() {
                               Copy the code below to use in your project.
                           </DialogDescription>
                         </DialogHeader>
-                        <ScrollArea className="h-full rounded-md bg-muted border">
-                            <pre className="text-sm p-4 overflow-x-auto">
+                        <ScrollArea className="h-full rounded-md bg-muted border p-4">
+                            <pre className="text-sm">
                                 <code>{lastAiResponse.content}</code>
                             </pre>
+                            <ScrollBar orientation="horizontal" />
                         </ScrollArea>
                         <DialogFooter>
                             <Button onClick={handleCopyCode}>
