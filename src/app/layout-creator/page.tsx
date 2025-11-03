@@ -9,14 +9,42 @@ import { Send, Loader2, History } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel, FormDescription } from '@/components/ui/form';
 import { generateLayout } from '@/ai/flows/generate-layout';
 
 // Import all the components that the AI can use
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from '@/components/ui/menubar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Progress } from '@/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter } from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 
 const formSchema = z.object({
@@ -31,18 +59,45 @@ type Message = {
 // Create a scope of all available components for the renderer
 const componentScope = {
   React,
+  // UI Components
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+  Alert, AlertDescription, AlertTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+  Avatar, AvatarImage, AvatarFallback,
+  Badge,
   Button,
+  Calendar,
+  Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
+  Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,
+  Checkbox,
+  Collapsible, CollapsibleContent, CollapsibleTrigger,
+  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+  Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription,
   Input,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
   Label,
-  Plus,
-  History
-  // Add any other components you want the AI to be able to use here
+  Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger,
+  Popover, PopoverContent, PopoverTrigger,
+  Progress,
+  RadioGroup, RadioGroupItem,
+  ScrollArea,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Separator,
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter,
+  Skeleton,
+  Slider,
+  Switch,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Tabs, TabsContent, TabsList, TabsTrigger,
+  Textarea,
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+  // Chart components
+  ChartContainer, ChartTooltip, ChartTooltipContent, BarChart, CartesianGrid, XAxis, Bar,
+  // Icons
+  Plus, History, Send, Loader2,
+  // Hooks and other utilities
+  useState, useMemo, useForm, z, zodResolver
 };
 
 const transformJsx = (jsx: string) => {
@@ -142,7 +197,9 @@ export default function LayoutCreatorPage() {
                      <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
             )}
-            <DynamicComponent jsx={lastAiResponse.content} />
+            <TooltipProvider>
+              <DynamicComponent jsx={lastAiResponse.content} />
+            </TooltipProvider>
           </div>
         );
     }

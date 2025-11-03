@@ -23,7 +23,8 @@ const GenerateLayoutOutputSchema = z.object({
 export type GenerateLayoutOutput = z.infer<typeof GenerateLayoutOutputSchema>;
 
 const componentExamples = `
-// Correct: Use the component name directly.
+// Correct: Use the component name directly. Use variants like 'destructive' or 'outline' for different styles.
+// Do not add custom color classes like 'bg-blue-500' or 'text-white'. Rely on the component's built-in styling.
 <Card className="w-full max-w-sm">
   <CardHeader>
     <CardTitle>Login</CardTitle>
@@ -44,11 +45,14 @@ const componentExamples = `
   </CardFooter>
 </Card>
 
-// Correct: A simple button.
+// Correct: A simple destructive button.
 <Button variant="destructive">Delete Item</Button>
 
-// Incorrect: Do not use HTML tags for components.
+// Incorrect: Do not use plain HTML tags where a component exists.
 // <form> ... <input/> <button>Submit</button> </form>
+
+// Incorrect: Do not add custom color or style classes. Let the component's variant do the work.
+// <Button className="bg-red-500 text-white rounded-lg">Delete</Button>
 `;
 
 export async function generateLayout(input: GenerateLayoutInput): Promise<GenerateLayoutOutput> {
@@ -66,7 +70,7 @@ const prompt = ai.definePrompt({
   - Do NOT include any markdown (\`\`\`jsx), explanations, or import statements.
   - You MUST use the component names like <Card>, <Button>, <Input>, and <Label> as shown in the examples. Do not use plain HTML elements like <form>, <button>, or <input> for these.
   - For professional layouts, wrap content in a <Card> component with <CardHeader>, <CardTitle>, <CardDescription>, <CardContent>, and <CardFooter>.
-  - Use Tailwind CSS classes for ALL styling via the 'className' attribute.
+  - Use Tailwind CSS classes for ALL styling via the 'className' attribute. HOWEVER, do not add custom colors (e.g., 'bg-blue-500'). Use component variants ('variant="destructive"') for different styles.
   - For form elements, always use a <Label> for accessibility.
   - For icons, use 'lucide-react' components (e.g., <Plus className="w-4 h-4" />). You can assume lucide-react icons are available.
   - Ensure the layout is responsive and aesthetically pleasing.
