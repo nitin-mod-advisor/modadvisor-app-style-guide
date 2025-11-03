@@ -5,12 +5,13 @@ import React, { useState, useMemo } from 'react';
 import * as Babel from '@babel/standalone';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2, History } from 'lucide-react';
+import { Send, Loader2, History, FilePlus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel, FormDescription } from '@/components/ui/form';
 import { generateLayout } from '@/ai/flows/generate-layout';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 // Import all the components that the AI can use
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -33,7 +34,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
@@ -84,7 +84,7 @@ const componentScope = {
   ScrollArea,
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
   Separator,
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetFooter,
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
   Skeleton,
   Slider,
   Switch,
@@ -176,6 +176,11 @@ export default function LayoutCreatorPage() {
       setIsLoading(false);
     }
   }
+  
+  function handleNewLayout() {
+    setMessages([]);
+    setError(null);
+  }
 
   const displayContent = () => {
     if (isLoading && !lastAiResponse) {
@@ -239,6 +244,10 @@ export default function LayoutCreatorPage() {
               <Button type="submit" size="icon" disabled={isLoading}>
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 <span className="sr-only">Send</span>
+              </Button>
+              <Button type="button" variant="outline" size="icon" disabled={isLoading || messages.length === 0} onClick={handleNewLayout}>
+                  <FilePlus className="h-4 w-4" />
+                  <span className="sr-only">New Layout</span>
               </Button>
               <Sheet>
                 <SheetTrigger asChild>
