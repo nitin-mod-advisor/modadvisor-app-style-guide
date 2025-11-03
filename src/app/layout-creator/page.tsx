@@ -5,13 +5,14 @@ import React, { useState, useMemo } from 'react';
 import * as Babel from '@babel/standalone';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2, History, FilePlus, Code } from 'lucide-react';
+import { Send, Loader2, History, FilePlus, Code, Clipboard } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel, FormDescription } from '@/components/ui/form';
 import { generateLayout } from '@/ai/flows/generate-layout';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useToast } from '@/hooks/use-toast';
 
 // Import all the components that the AI can use
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -95,7 +96,7 @@ const componentScope = {
   // Chart components
   ChartContainer, ChartTooltip, ChartTooltipContent, BarChart, CartesianGrid, XAxis, Bar,
   // Icons
-  Plus, History, Send, Loader2, Code,
+  Plus, History, Send, Loader2, Code, Clipboard,
   // Hooks and other utilities
   useState, useMemo, useForm, z, zodResolver
 };
@@ -132,6 +133,7 @@ export default function LayoutCreatorPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -181,6 +183,16 @@ export default function LayoutCreatorPage() {
     setMessages([]);
     setError(null);
   }
+
+  const handleCopyCode = () => {
+    if (lastAiResponse) {
+      navigator.clipboard.writeText(lastAiResponse.content);
+      toast({
+        title: "Code Copied!",
+        description: "The JSX code has been copied to your clipboard.",
+      });
+    }
+  };
 
   const displayContent = () => {
     if (isLoading && !lastAiResponse) {
@@ -253,18 +265,29 @@ export default function LayoutCreatorPage() {
                             <span className="sr-only">Get Code</span>
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
                         <DialogHeader>
-                        <DialogTitle>Generated JSX Code</DialogTitle>
-                        <DialogDescription>
-                            Copy the code below to use in your project.
-                        </DialogDescription>
+                          <DialogTitle>Generated JSX Code</DialogTitle>
+                          <DialogDescription>
+                              Copy the code below to use in your project.
+                          </DialogDescription>
                         </DialogHeader>
-                        <ScrollArea className="max-h-[50vh] rounded-md bg-muted p-4">
-                            <pre>
-                                <code>{lastAiResponse.content}</code>
-                            </pre>
-                        </ScrollArea>
+                        <div className="relative flex-1">
+                           <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-2 right-2 h-8 w-8"
+                              onClick={handleCopyCode}
+                            >
+                              <Clipboard className="h-4 w-4" />
+                              <span className="sr-only">Copy Code</span>
+                            </Button>
+                          <ScrollArea className="h-full rounded-md bg-muted p-4">
+                              <pre className="text-sm">
+                                  <code>{lastAiResponse.content}</code>
+                              </pre>
+                          </ScrollArea>
+                        </div>
                     </DialogContent>
                 </Dialog>
               )}
@@ -299,3 +322,5 @@ export default function LayoutCreatorPage() {
     </div>
   );
 }
+
+    
