@@ -5,7 +5,7 @@ import React, { useState, useMemo } from 'react';
 import * as Babel from '@babel/standalone';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2, History, FilePlus } from 'lucide-react';
+import { Send, Loader2, History, FilePlus, Code } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -95,7 +95,7 @@ const componentScope = {
   // Chart components
   ChartContainer, ChartTooltip, ChartTooltipContent, BarChart, CartesianGrid, XAxis, Bar,
   // Icons
-  Plus, History, Send, Loader2,
+  Plus, History, Send, Loader2, Code,
   // Hooks and other utilities
   useState, useMemo, useForm, z, zodResolver
 };
@@ -245,6 +245,29 @@ export default function LayoutCreatorPage() {
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 <span className="sr-only">Send</span>
               </Button>
+               {lastAiResponse && (
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button type="button" variant="outline" size="icon">
+                            <Code className="h-4 w-4" />
+                            <span className="sr-only">Get Code</span>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                        <DialogTitle>Generated JSX Code</DialogTitle>
+                        <DialogDescription>
+                            Copy the code below to use in your project.
+                        </DialogDescription>
+                        </DialogHeader>
+                        <ScrollArea className="max-h-[50vh] rounded-md bg-muted p-4">
+                            <pre>
+                                <code>{lastAiResponse.content}</code>
+                            </pre>
+                        </ScrollArea>
+                    </DialogContent>
+                </Dialog>
+              )}
               <Button type="button" variant="outline" size="icon" disabled={isLoading || messages.length === 0} onClick={handleNewLayout}>
                   <FilePlus className="h-4 w-4" />
                   <span className="sr-only">New Layout</span>
