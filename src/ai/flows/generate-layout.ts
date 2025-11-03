@@ -22,46 +22,8 @@ const GenerateLayoutOutputSchema = z.object({
 export type GenerateLayoutOutput = z.infer<typeof GenerateLayoutOutputSchema>;
 
 const componentExamples = `
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { CheckCircle, Info, AlertTriangle, XCircle, Home, Settings, Calendar as CalendarIcon, Plus, User, Type } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Label } from '@/components/ui/label';
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from '@/components/ui/menubar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Progress } from '@/components/ui/progress';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+// The components below are already imported for you.
+// Focus on generating only the JSX structure.
 
 // Card Example
 <Card className="w-full max-w-sm">
@@ -77,38 +39,19 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
     </CardFooter>
 </Card>
 
-// Form Example
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-})
-// ... inside component
-const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { username: "" },
-})
-function onSubmit(values: z.infer<typeof formSchema>) { console.log(values) }
-
-<Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full max-w-sm">
-        <FormField
-        control={form.control}
-        name="username"
-        render={({ field }) => (
-            <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                    <Input placeholder="shadcn" {...field} />
-                </FormControl>
-                <FormDescription>This is your public display name.</FormDescription>
-                <FormMessage />
-            </FormItem>
-        )}
-        />
-        <Button type="submit">Submit</Button>
-    </form>
-</Form>
+// Form Example (without logic)
+<form className="space-y-8 w-full max-w-sm">
+    <div className="space-y-2">
+        <Label htmlFor="username">Username</Label>
+        <Input id="username" placeholder="shadcn" />
+        <p className="text-sm text-muted-foreground">This is your public display name.</p>
+    </div>
+    <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input type="email" id="email" placeholder="user@example.com" />
+    </div>
+    <Button type="submit">Submit</Button>
+</form>
 
 // Button Example
 <Button variant="default" size="default">Click Me</Button>
@@ -116,9 +59,9 @@ function onSubmit(values: z.infer<typeof formSchema>) { console.log(values) }
 <Button variant="outline" size="icon"><Plus /></Button>
 
 // Input with Label Example
-<div>
-    <Label htmlFor="email">Your email address</Label>
-    <Input type="email" id="email" placeholder="Email" />
+<div className="grid w-full max-w-sm items-center gap-1.5">
+    <Label htmlFor="email-2">Email</Label>
+    <Input type="email" id="email-2" placeholder="Email" />
 </div>
 `;
 
@@ -138,7 +81,7 @@ const prompt = ai.definePrompt({
   - For professional layouts, wrap content in a <Card> component with <CardHeader>, <CardTitle>, <CardDescription>, <CardContent>, and <CardFooter> as shown in the examples.
   - Use Tailwind CSS classes for all styling via the 'className' attribute.
   - For form elements, always use a <Label> for accessibility.
-  - For icons, use 'lucide-react' components (e.g., <Home className="w-4 h-4" />).
+  - For icons, use 'lucide-react' components (e.g., <Home className="w-4 h-4" />). You can assume lucide-react icons are available.
   - Ensure the layout is responsive.
 
   ---
@@ -164,5 +107,3 @@ const generateLayoutFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
