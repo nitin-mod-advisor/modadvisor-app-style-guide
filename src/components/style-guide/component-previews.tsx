@@ -1779,30 +1779,86 @@ const ToastPreview = () => {
             title="Toast"
             code={`
 const { toast } = useToast();
-<Button
-    variant="outline"
-    onClick={() => {
-        toast({
-            title: "Scheduled: Catch up ",
-            description: "Friday, February 10, 2023 at 5:57 PM",
-        })
-    }}
->
-    Show Toast
-</Button>
+
+// Default
+toast({
+    title: "Event Scheduled",
+    description: "A new event has been added to your calendar.",
+});
+
+// Success
+toast({
+    variant: "success",
+    title: "Success!",
+    description: "Your changes have been saved.",
+});
+
+// Warning
+toast({
+    variant: "warning",
+    title: "Warning!",
+    description: "Please check your input values.",
+});
+
+// Destructive
+toast({
+    variant: "destructive",
+    title: "Error!",
+    description: "Something went wrong.",
+});
             `}
         >
-            <Button
-                variant="outline"
-                onClick={() => {
-                    toast({
-                        title: "Scheduled: Catch up ",
-                        description: "Friday, February 10, 2023 at 5:57 PM",
-                    })
-                }}
-            >
-                Show Toast
-            </Button>
+            <div className="flex flex-wrap gap-2">
+                <Button
+                    variant="outline"
+                    onClick={() => {
+                        toast({
+                            title: "Event Scheduled",
+                            description: "A new event has been added to your calendar.",
+                        })
+                    }}
+                >
+                    Show Default
+                </Button>
+                <Button
+                    variant="outline"
+                    className="border-success text-success hover:bg-success hover:text-success-foreground"
+                    onClick={() => {
+                        toast({
+                            variant: "success",
+                            title: "Success!",
+                            description: "Your changes have been saved.",
+                        })
+                    }}
+                >
+                    Show Success
+                </Button>
+                <Button
+                    variant="outline"
+                    className="border-warning text-warning hover:bg-warning hover:text-warning-foreground"
+                    onClick={() => {
+                        toast({
+                            variant: "warning",
+                            title: "Warning!",
+                            description: "Please check your input values.",
+                        })
+                    }}
+                >
+                    Show Warning
+                </Button>
+                <Button
+                    variant="destructive"
+                    onClick={() => {
+                        toast({
+                            variant: "destructive",
+                            title: "Error!",
+                            description: "Something went wrong.",
+                        })
+                    }}
+                >
+                    Show Failure
+                </Button>
+            </div>
         </PreviewContainer>
     )
 };
