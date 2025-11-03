@@ -44,7 +44,6 @@ const prompt = ai.definePrompt({
   - Structure the layout professionally. For most components, you should wrap them in a <Card> component to provide a clear, contained context.
   - Use the Card sub-components like <CardHeader>, <CardTitle>, <CardDescription>, <CardContent>, and <CardFooter> to organize the content within the card logically. For example, a form's inputs should be in <CardContent> and its submit button in <CardFooter>.
   - Use Tailwind CSS classes for all styling. Use the 'className' attribute.
-  - Use appropriate spacing and layout utilities (e.g., 'space-y-4', 'grid', 'flex') to ensure the layout is well-organized and visually appealing.
   - You MUST use the following ShadCN UI components where appropriate. The components are already imported. Available components: ${availableComponents.join(', ')}.
   - For form elements, always use a <Label> for accessibility.
   - For icons, use 'lucide-react' components (e.g., <Home className="w-4 h-4" />).
