@@ -1,44 +1,55 @@
-/**
- * @fileOverview Firestore Security Rules for Color Palette and Typography Management
- *
- * Core Philosophy:
- * This ruleset prioritizes ease of prototyping. It allows public read access to color palettes
- * and typography settings but requires authentication for any modification (create, update, delete).
- *
- * Data Structure:
- * - Color palettes: /palettes/{paletteId}
- * - Typography settings: /settings/typography
- *
- * Key Security Decisions:
- * - Public read access: Any user can read (get, list) palettes and settings.
- * - Authenticated writes: Only authenticated users can create, update, or delete data.
- */
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Allows public read access to color palettes, but requires authentication for writes.
-     * @path /palettes/{paletteId}
+     * @description Public read access, but only authorized users can write.
+     * Authorization is checked against the /allowed_users collection.
      */
     match /palettes/{paletteId} {
-      allow get, list: if true;
-      allow create, update, delete: if isSignedIn();
+      allow get: if true;
+      allow list: if true;
+      allow write: if isSignedIn() && isAllowed(request.auth.token.email);
     }
 
     /**
-     * @description Allows public read of typography settings, but requires auth for writes.
-     * The path is written to match a specific document, not a collection.
-     * @path /settings/typography
+     * @description Public read access, but only authorized users can write.
+     * Authorization is checked against the /allowed_users collection.
      */
     match /settings/typography {
-       allow get, list: if true;
-       allow create, update, delete: if isSignedIn();
+       allow get: if true;
+       allow write: if isSignedIn() && isAllowed(request.auth.token.email);
+    }
+    
+    /**
+     * @description Allowed users can be read by any authenticated user,
+     * but can only be written to by users who are themselves allowed.
+     * This prevents an unauthorized user from adding themselves to the list.
+     */
+    match /allowed_users/{email} {
+        allow get: if isSignedIn();
+        allow list: if isSignedIn();
+        allow write: if isSignedIn() && isAllowed(request.auth.token.email);
+    }
+
+    /**
+     * @description Login attempts can only be created by an authenticated user.
+     * No one can read, update, or delete them to protect privacy.
+     */
+    match /login_attempts/{attemptId} {
+        allow read, update, delete: if false;
+        allow create: if isSignedIn();
     }
 
     // Helper function to check if the user is signed in.
     function isSignedIn() {
-      return request.auth != null;
+      return request.auth != null && request.auth.token.email_verified;
+    }
+    
+    // Helper function to check if a user's email exists in the allowed_users collection.
+    function isAllowed(email) {
+        return exists(/databases/$(database)/documents/allowed_users/$(email));
     }
   }
 }

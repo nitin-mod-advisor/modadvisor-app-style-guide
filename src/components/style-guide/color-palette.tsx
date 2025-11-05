@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react';
@@ -8,6 +9,7 @@ import { Input } from '@/components/ui/input';
 interface ColorPaletteProps {
   tokens: ColorToken[];
   onColorChange: (tokenName: string, theme: 'light' | 'dark', value: string) => void;
+  disabled: boolean;
 }
 
 function convertHslToHex(hsl: string) {
@@ -70,7 +72,7 @@ function convertHexToHsl(hex: string): string {
 }
 
 
-export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
+export function ColorPalette({ tokens, onColorChange, disabled }: ColorPaletteProps) {
   const { theme } = useTheme();
 
   const handleTextChange = (tokenName: string, theme: 'light' | 'dark', value: string) => {
@@ -108,6 +110,7 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
                         onChange={(e) => handlePickerChange(token.name, 'light', e.target.value)}
                         className="w-full h-full p-0 border-none rounded-md cursor-pointer bg-transparent absolute inset-0 opacity-0"
                         aria-label={`Light theme color for ${token.name}`}
+                        disabled={disabled}
                       />
                        <div 
                         className="w-8 h-8 rounded-md border border-border"
@@ -120,6 +123,7 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
                       onChange={(e) => handleTextChange(token.name, 'light', e.target.value)}
                       className="font-mono text-sm w-48"
                       aria-label={`Light theme HSL code for ${token.name}`}
+                      disabled={disabled}
                     />
                   </div>
                 </td>
@@ -132,6 +136,7 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
                         onChange={(e) => handlePickerChange(token.name, 'dark', e.target.value)}
                         className="w-full h-full p-0 border-none rounded-md cursor-pointer bg-transparent absolute inset-0 opacity-0"
                         aria-label={`Dark theme color for ${token.name}`}
+                        disabled={disabled}
                       />
                        <div 
                         className="w-8 h-8 rounded-md border border-border"
@@ -144,6 +149,7 @@ export function ColorPalette({ tokens, onColorChange }: ColorPaletteProps) {
                       onChange={(e) => handleTextChange(token.name, 'dark', e.target.value)}
                       className="font-mono text-sm w-48"
                       aria-label={`Dark theme HSL code for ${token.name}`}
+                      disabled={disabled}
                     />
                   </div>
                 </td>

@@ -1,9 +1,9 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { doc } from 'firebase/firestore';
-import { useFirestore, useDoc, useMemoFirebase, setDocumentNonBlocking } from '@/firebase';
+import React, { useState, useEffect, useMemo } from 'react';
+import { doc, getDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useFirestore, useDoc, useMemoFirebase, setDocumentNonBlocking, useUser, useAuth, addDocumentNonBlocking } from '@/firebase';
 import {
   Select,
   SelectContent,
@@ -13,9 +13,11 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TypographySettings } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 const TYPOGRAPHY_SETTINGS_ID = "typography";
 const SETTINGS_COLLECTION = "settings";
+const ALLOWED_USERS_COLLECTION = "allowed_users";
 const DEFAULT_FONT = "'Inter', sans-serif";
 
 const fonts = [
@@ -31,7 +33,10 @@ const fonts = [
 
 export default function TypographyPage() {
   const [activeFont, setActiveFont] = useState<string | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
+  const { toast } = useToast();
 
   const settingsRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -40,24 +45,44 @@ export default function TypographyPage() {
 
   const { data: settingsData, isLoading: isSettingsLoading } = useDoc<TypographySettings>(settingsRef);
 
+   // This effect handles user authentication state
+  useEffect(() => {
+    // If there is a user and they are not anonymous, check for authorization
+    if (user && !user.isAnonymous && firestore) {
+      const checkAuthorization = async () => {
+        if (!user.email) {
+          setIsAuthorized(false);
+          return;
+        }
+        const userDocRef = doc(firestore, ALLOWED_USERS_COLLECTION, user.email);
+        const loginAttemptsRef = collection(firestore, 'login_attempts');
+        try {
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setIsAuthorized(true);
+            // Don't log here to avoid duplicate logs from home page
+          } else {
+            setIsAuthorized(false);
+            // Don't toast here to avoid duplicate toasts
+          }
+        } catch (error) {
+          console.error("Authorization check failed:", error);
+          setIsAuthorized(false);
+        }
+      };
+      checkAuthorization();
+    } else {
+      // If user is anonymous or not logged in, they are not authorized
+      setIsAuthorized(false);
+    }
+  }, [user, firestore]);
+
   // This is the corrected effect to handle initial data loading and persistence.
   useEffect(() => {
-    // If we have data from Firestore, it is the source of truth.
     if (settingsData) {
       setActiveFont(settingsData.fontFamily);
       return;
     }
-    
-    // This is the critical check. We only write the default if:
-    // 1. Loading is complete.
-    // 2. We have confirmed there is no data.
-    // 3. We haven't already tried to set the font locally (to prevent race conditions).
-    // if (!isSettingsLoading && !settingsData && settingsRef && activeFont === null) {
-    //   // Set the default font locally and save it to the database.
-    //   // This block will only run ONCE when the document doesn't exist.
-    //   setActiveFont(DEFAULT_FONT);
-    //   setDocumentNonBlocking(settingsRef, { fontFamily: DEFAULT_FONT }, { merge: false });
-    // }
   }, [settingsData, isSettingsLoading, settingsRef, activeFont]);
   
   // This local effect is for the typography page itself. 
@@ -69,6 +94,14 @@ export default function TypographyPage() {
   }, [activeFont]);
 
   const handleFontChange = (fontFamily: string) => {
+    if (!isAuthorized) {
+        toast({
+            variant: "destructive",
+            title: "Not Authorized",
+            description: "You must be an authorized user to make changes. Please sign in."
+        });
+        return;
+    }
     setActiveFont(fontFamily);
     if (settingsRef) {
       setDocumentNonBlocking(settingsRef, { fontFamily }, { merge: true });
@@ -79,6 +112,8 @@ export default function TypographyPage() {
     if (!fontFamily) return '';
     return fontFamily.split(',')[0].replace(/'/g, '');
   };
+
+  const canEdit = isAuthorized && !user?.isAnonymous;
 
   if (isSettingsLoading && !settingsData) {
     return (
@@ -99,7 +134,7 @@ export default function TypographyPage() {
           <p className="text-muted-foreground">
             Select a font to apply it to the entire application. The change is saved to the database.
           </p>
-          <Select value={activeFont ?? ''} onValueChange={handleFontChange}>
+          <Select value={activeFont ?? ''} onValueChange={handleFontChange} disabled={!canEdit}>
             <SelectTrigger className="w-full max-w-xs">
               <SelectValue placeholder="Select a font">
                 {getFontFamilyName(activeFont)}

@@ -1,24 +1,26 @@
 
 "use client"
 
-import React, { useEffect, useState } from 'react';
-import { doc } from 'firebase/firestore';
+import React, { useEffect, useState, useMemo } from 'react';
+import { doc, collection, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-//import { INITIAL_TOKENS } from '@/lib/style-guide-data';
 import { ColorPalette } from '@/components/style-guide/color-palette';
 import { CodePreviews } from '@/components/style-guide/code-previews';
-import { type ColorToken, type ColorPalette as ColorPaletteType } from '@/lib/types';
-import { useFirestore, useDoc, useMemoFirebase, useUser, initiateAnonymousSignIn, useAuth, setDocumentNonBlocking } from '@/firebase';
+import { type ColorToken, type ColorPalette as ColorPaletteType, AllowedUser } from '@/lib/types';
+import { useFirestore, useDoc, useMemoFirebase, useUser, initiateAnonymousSignIn, useAuth, setDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { PlusCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { UserMenu } from '@/components/user-menu';
 
 const PALETTE_ID = "default-palette";
+const ALLOWED_USERS_COLLECTION = "allowed_users";
 
 const formSchema = z.object({
   name: z.string().startsWith('--', { message: "Must start with --" }),
@@ -27,7 +29,7 @@ const formSchema = z.object({
   dark: z.string().refine(val => val.startsWith('hsl(') || val.startsWith('#'), { message: "Must be a valid HSL or hex color" }),
 });
 
-function AddVariableDialog({ onAddVariable }: { onAddVariable: (variable: ColorToken) => void }) {
+function AddVariableDialog({ onAddVariable, disabled }: { onAddVariable: (variable: ColorToken) => void, disabled: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,7 +50,7 @@ function AddVariableDialog({ onAddVariable }: { onAddVariable: (variable: ColorT
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button disabled={disabled}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Variable
         </Button>
@@ -127,10 +129,12 @@ function AddVariableDialog({ onAddVariable }: { onAddVariable: (variable: ColorT
 export default function Home() {
   const [tokens, setTokens] = useState<ColorToken[]>([]);
   const [isClient, setIsClient] = React.useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   const firestore = useFirestore();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
+  const { toast } = useToast();
   
   const paletteRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -139,11 +143,64 @@ export default function Home() {
 
   const { data: paletteData, isLoading: isPaletteLoading } = useDoc<ColorPaletteType>(paletteRef);
   
+  // This effect handles user authentication state
   useEffect(() => {
-    if (!user && !isUserLoading && auth) {
+    // If not loading and no user, sign in anonymously
+    if (!isUserLoading && !user && auth) {
       initiateAnonymousSignIn(auth);
     }
-  }, [user, isUserLoading, auth]);
+    
+    // If there is a user and they are not anonymous, check for authorization
+    if (user && !user.isAnonymous && firestore) {
+      const checkAuthorization = async () => {
+        if (!user.email) {
+          setIsAuthorized(false);
+          return;
+        }
+        const userDocRef = doc(firestore, ALLOWED_USERS_COLLECTION, user.email);
+        const loginAttemptsRef = collection(firestore, 'login_attempts');
+
+        try {
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setIsAuthorized(true);
+             addDocumentNonBlocking(loginAttemptsRef, {
+                email: user.email,
+                status: 'success',
+                timestamp: serverTimestamp()
+            });
+          } else {
+            setIsAuthorized(false);
+            toast({
+              variant: "destructive",
+              title: "Authorization Failed",
+              description: "Your email is not authorized to make edits.",
+            });
+            addDocumentNonBlocking(loginAttemptsRef, {
+                email: user.email,
+                status: 'failure',
+                reason: 'Email not in allowed list',
+                timestamp: serverTimestamp()
+            });
+          }
+        } catch (error) {
+          console.error("Authorization check failed:", error);
+          setIsAuthorized(false);
+           addDocumentNonBlocking(loginAttemptsRef, {
+                email: user.email,
+                status: 'failure',
+                reason: 'Error checking authorization',
+                timestamp: serverTimestamp()
+            });
+        }
+      };
+      checkAuthorization();
+    } else {
+      // If user is anonymous or not logged in, they are not authorized
+      setIsAuthorized(false);
+    }
+  }, [user, isUserLoading, auth, firestore, toast]);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -151,22 +208,9 @@ export default function Home() {
 
   // Effect to synchronize Firestore data to local state AND bootstrap if necessary.
   useEffect(() => {
-    // If data comes back from Firestore, update the local state.
     if (paletteData) {
       setTokens(paletteData.tokens);
     } 
-    // This is the critical check:
-    // If the hook is done loading AND there is still no data, it means the document
-    // does not exist. This is the ONLY time we should create it.
-    // else if (!isPaletteLoading && !paletteData && paletteRef) {
-    //   const initialPalette: ColorPaletteType = {
-    //     id: PALETTE_ID,
-    //     tokens: INITIAL_TOKENS,
-    //   };
-    //   // We set the local state AND save to Firestore so the UI is in sync.
-    //   setTokens(initialPalette.tokens);
-    //   setDocumentNonBlocking(paletteRef, initialPalette, { merge: false });
-    // }
   }, [paletteData, isPaletteLoading, paletteRef]);
   
   // Effect to dynamically update CSS variables in the document head
@@ -182,7 +226,6 @@ export default function Home() {
     }
     
     const lightVars = tokens.map(token => {
-        // For HSL, extract just the numbers. For hex, use as is.
         const value = token.light.startsWith('hsl') 
             ? token.light.replace('hsl(', '').replace(')', '').replace(/%/g, '')
             : token.light;
@@ -210,6 +253,14 @@ ${darkVars}
   }, [tokens, isClient]);
 
   const updateTokens = (newTokens: ColorToken[]) => {
+    if (!isAuthorized) {
+        toast({
+            variant: 'destructive',
+            title: "Not Authorized",
+            description: "You must be an authorized user to make changes."
+        });
+        return;
+    }
     setTokens(newTokens);
     if (paletteRef) {
       setDocumentNonBlocking(paletteRef, { tokens: newTokens }, { merge: true });
@@ -236,15 +287,17 @@ ${darkVars}
     );
   }
 
+  const canEdit = isAuthorized && !user?.isAnonymous;
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Color Palette</h2>
-        <AddVariableDialog onAddVariable={handleAddVariable} />
+        <AddVariableDialog onAddVariable={handleAddVariable} disabled={!canEdit} />
       </div>
       {tokens.length > 0 ? (
         <>
-          <ColorPalette tokens={tokens} onColorChange={handleColorChange} />
+          <ColorPalette tokens={tokens} onColorChange={handleColorChange} disabled={!canEdit} />
           <CodePreviews tokens={tokens} />
         </>
       ) : (
@@ -255,5 +308,3 @@ ${darkVars}
     </div>
   );
 }
-
-    

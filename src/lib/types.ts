@@ -1,3 +1,4 @@
+
 export type ColorToken = {
   name: string;
   role: string;
@@ -12,4 +13,16 @@ export type ColorPalette = {
 
 export type TypographySettings = {
   fontFamily: string;
+};
+
+export type AllowedUser = {
+    email: string;
+};
+
+export type LoginAttempt = {
+    id?: string;
+    email: string;
+    status: 'success' | 'failure';
+    timestamp: Date;
+    reason?: string;
 };

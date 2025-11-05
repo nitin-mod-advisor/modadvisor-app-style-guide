@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "ColorPalette": {
@@ -47,11 +48,53 @@
         }
       },
       "required": ["fontFamily"]
+    },
+    "AllowedUser": {
+        "title": "AllowedUser",
+        "type": "object",
+        "description": "Represents a user who is authorized to make edits.",
+        "properties": {
+            "email": {
+                "type": "string",
+                "format": "email",
+                "description": "The email address of the authorized user."
+            }
+        },
+        "required": ["email"]
+    },
+    "LoginAttempt": {
+        "title": "LoginAttempt",
+        "type": "object",
+        "description": "Logs an attempt to sign in to the application.",
+        "properties": {
+            "email": {
+                "type": "string",
+                "format": "email",
+                "description": "The email address used for the login attempt."
+            },
+            "status": {
+                "type": "string",
+                "enum": ["success", "failure"],
+                "description": "Whether the login and authorization was successful or not."
+            },
+            "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The timestamp of the login attempt."
+            },
+            "reason": {
+                "type": "string",
+                "description": "The reason for a failed login attempt (e.g., 'Email not in allowed list')."
+            }
+        },
+        "required": ["email", "status", "timestamp"]
     }
   },
   "auth": {
     "providers": [
-      "anonymous"
+      "anonymous",
+      "google.com",
+      "microsoft.com"
     ]
   },
   "firestore": {
@@ -75,6 +118,26 @@
           },
           "description": "Stores global typography settings. This is a single-document path."
         }
+      },
+      {
+          "path": "/allowed_users/{email}",
+          "definition": {
+              "entityName": "AllowedUser",
+              "schema": {
+                  "$ref": "#/backend/entities/AllowedUser"
+              },
+              "description": "A collection where each document ID is the email of an authorized user."
+          }
+      },
+      {
+          "path": "/login_attempts/{attemptId}",
+          "definition": {
+              "entityName": "LoginAttempt",
+              "schema": {
+                  "$ref": "#/backend/entities/LoginAttempt"
+              },
+              "description": "A collection to log all user login attempts for auditing."
+          }
       }
     ]
   }
