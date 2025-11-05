@@ -30,4 +30,3 @@ export function signInWithMicrosoft(authInstance: Auth): void {
       console.error("Microsoft sign-in error", error);
   });
 }
-

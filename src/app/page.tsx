@@ -17,7 +17,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { UserMenu } from '@/components/user-menu';
 
 const PALETTE_ID = "default-palette";
 const ALLOWED_USERS_COLLECTION = "allowed_users";
