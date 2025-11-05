@@ -3,25 +3,33 @@
 
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { Auth, getAuth } from 'firebase/auth';
+import { Firestore, getFirestore } from 'firebase/firestore';
 
-export function initializeFirebase() {
-  if (getApps().length) {
-    const app = getApp();
-    return getSdks(app);
+let firebaseApp: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let firestore: Firestore | null = null;
+
+function getFirebaseServices() {
+  if (typeof window !== 'undefined') {
+    if (!getApps().length) {
+      firebaseApp = initializeApp(firebaseConfig);
+      auth = getAuth(firebaseApp);
+      firestore = getFirestore(firebaseApp);
+    } else {
+      firebaseApp = getApp();
+      auth = getAuth(firebaseApp);
+      firestore = getFirestore(firebaseApp);
+    }
   }
   
-  const firebaseApp = initializeApp(firebaseConfig);
-  return getSdks(firebaseApp);
+  // Return nulls on the server
+  return { firebaseApp, auth, firestore };
 }
 
-export function getSdks(firebaseApp: FirebaseApp) {
-  return {
-    firebaseApp,
-    auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp)
-  };
+
+export function initializeFirebase() {
+  return getFirebaseServices();
 }
 
 

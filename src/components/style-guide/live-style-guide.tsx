@@ -29,6 +29,7 @@ import {
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { UserMenu } from '@/components/user-menu';
+import { GlobalFontUpdater } from '../global-font-updater';
 
 const components = [
     { name: 'Accordion', icon: Rows, slug: 'accordion' },
@@ -167,6 +168,7 @@ export default function LiveStyleGuide({
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
+        <GlobalFontUpdater />
         <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 h-16 bg-surface/80 backdrop-blur-sm border-b border-border">
           <SidebarTrigger />
           <div className="flex items-center gap-4">

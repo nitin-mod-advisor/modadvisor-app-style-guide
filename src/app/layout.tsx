@@ -1,10 +1,10 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from "@/components/ui/toaster";
 import LiveStyleGuide from '@/components/style-guide/live-style-guide';
 import { FirebaseClientProvider } from '@/firebase';
-import { GlobalFontUpdater } from '@/components/global-font-updater';
 
 export const metadata: Metadata = {
   title: 'Live Style Guide Editor',
@@ -25,7 +25,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <FirebaseClientProvider>
-          <GlobalFontUpdater />
           <ThemeProvider
             attribute="class"
             defaultTheme="light"

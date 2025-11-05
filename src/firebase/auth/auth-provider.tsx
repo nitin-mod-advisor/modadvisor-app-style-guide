@@ -10,7 +10,9 @@ import {
 
 /** Initiate anonymous sign-in (non-blocking). */
 export function initiateAnonymousSignIn(authInstance: Auth): void {
-  signInAnonymously(authInstance);
+  signInAnonymously(authInstance).catch(error => {
+    console.error("Anonymous sign-in error", error);
+  });
 }
 
 /** Initiate sign-in with Google. */
@@ -28,3 +30,4 @@ export function signInWithMicrosoft(authInstance: Auth): void {
       console.error("Microsoft sign-in error", error);
   });
 }
+
