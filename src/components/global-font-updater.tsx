@@ -12,6 +12,8 @@ export function GlobalFontUpdater() {
   const firestore = useFirestore();
 
   const settingsRef = useMemoFirebase(() => {
+    // This check is crucial. If firestore is null (as it is on the server),
+    // this will return null, and the useDoc hook will not run.
     if (!firestore) return null;
     return doc(firestore, SETTINGS_COLLECTION, TYPOGRAPHY_SETTINGS_ID);
   }, [firestore]);
@@ -19,6 +21,8 @@ export function GlobalFontUpdater() {
   const { data: settingsData } = useDoc<TypographySettings>(settingsRef);
 
   useEffect(() => {
+    // The effect will only run if settingsData is populated, which can only
+    // happen on the client where firestore is available.
     if (settingsData?.fontFamily) {
       document.documentElement.style.setProperty('--font-body', settingsData.fontFamily);
     }
