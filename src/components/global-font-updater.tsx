@@ -1,33 +1,42 @@
+
 'use client';
 
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { doc } from 'firebase/firestore';
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useDoc, useMemoFirebase, FirebaseContext } from '@/firebase';
 import { TypographySettings } from '@/lib/types';
 
 const TYPOGRAPHY_SETTINGS_ID = "typography";
 const SETTINGS_COLLECTION = "settings";
 
 export function GlobalFontUpdater() {
-  const firestore = useFirestore();
+  const firebaseContext = useContext(FirebaseContext);
 
-  const settingsRef = useMemoFirebase(() => {
-    // This check is crucial. If firestore is null (as it is on the server),
-    // this will return null, and the useDoc hook will not run.
-    if (!firestore) return null;
-    return doc(firestore, SETTINGS_COLLECTION, TYPOGRAPHY_SETTINGS_ID);
-  }, [firestore]);
+  // This component will render on the server, but we need to ensure
+  // that the hooks that depend on the Firebase context are only called on the client.
+  // The context will be undefined on the server, so we return null.
+  if (!firebaseContext || !firebaseContext.firestore) {
+    return null;
+  }
+  
+  return <ClientFontUpdater />;
+}
 
-  const { data: settingsData } = useDoc<TypographySettings>(settingsRef);
+function ClientFontUpdater() {
+    const { firestore } = useContext(FirebaseContext)!;
 
-  useEffect(() => {
-    // The effect will only run if settingsData is populated, which can only
-    // happen on the client where firestore is available.
-    if (settingsData?.fontFamily) {
-      document.documentElement.style.setProperty('--font-body', settingsData.fontFamily);
-    }
-  }, [settingsData]);
+    const settingsRef = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return doc(firestore, SETTINGS_COLLECTION, TYPOGRAPHY_SETTINGS_ID);
+    }, [firestore]);
 
-  // This component does not render anything
-  return null;
+    const { data: settingsData } = useDoc<TypographySettings>(settingsRef);
+
+    useEffect(() => {
+        if (settingsData?.fontFamily) {
+            document.documentElement.style.setProperty('--font-body', settingsData.fontFamily);
+        }
+    }, [settingsData]);
+
+    return null;
 }
