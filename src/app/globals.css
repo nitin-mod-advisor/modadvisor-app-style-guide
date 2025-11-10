@@ -49,15 +49,6 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: hsl(var(--card));
-    --sidebar-foreground: hsl(var(--card-foreground));
-    --sidebar-primary: hsl(var(--primary));
-    --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: hsl(var(--accent));
-    --sidebar-accent-foreground: hsl(var(--accent-foreground));
-    --sidebar-border: hsl(var(--border));
-    --sidebar-ring: hsl(var(--ring));
-
     --gradient-sidebar-active: linear-gradient(43deg, rgb(52, 211, 153) 0%, rgb(45, 212, 191) 100%);
     --shadow-sidebar-active: 0 10px 15px -3px hsla(158, 64%, 52%, 0.3), 0 4px 6px -4px hsla(170, 70%, 45%, 0.3);
 
