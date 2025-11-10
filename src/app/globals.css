@@ -49,14 +49,14 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 5% 20%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 152 75% 94%;
-    --sidebar-accent-foreground: 152 75% 30%;
-    --sidebar-border: 240 4% 88%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-background: hsl(var(--card));
+    --sidebar-foreground: hsl(var(--card-foreground));
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(var(--accent));
+    --sidebar-accent-foreground: hsl(var(--accent-foreground));
+    --sidebar-border: hsl(var(--border));
+    --sidebar-ring: hsl(var(--ring));
 
     --gradient-sidebar-active: linear-gradient(43deg, rgb(52, 211, 153) 0%, rgb(45, 212, 191) 100%);
     --shadow-sidebar-active: 0 10px 15px -3px hsla(158, 64%, 52%, 0.3), 0 4px 6px -4px hsla(170, 70%, 45%, 0.3);
@@ -115,18 +115,6 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-
-    --sidebar-background: 222.2 84% 8%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 152 75% 15%;
-    --sidebar-accent-foreground: 152 75% 70%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 217 91% 60%;
-
-    --gradient-sidebar-active: linear-gradient(43deg, rgb(52, 211, 153) 0%, rgb(45, 212, 191) 100%);
-    --shadow-sidebar-active: 0 10px 15px -3px hsla(158, 64%, 52%, 0.3), 0 4px 6px -4px hsla(170, 70%, 45%, 0.3);
   }
 
   body {
