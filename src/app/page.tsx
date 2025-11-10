@@ -3,6 +3,7 @@
 
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
+import LiveStyleGuide from '@/components/style-guide/live-style-guide';
 
 const PageClient = dynamic(() => import('@/app/page-client'), {
   ssr: false,
@@ -19,5 +20,9 @@ const PageClient = dynamic(() => import('@/app/page-client'), {
 })
 
 export default function Home() {
-  return <PageClient />
+  return (
+    <LiveStyleGuide>
+        <PageClient activeTheme="default"/>
+    </LiveStyleGuide>
+  )
 }

@@ -1,13 +1,12 @@
 
-
 "use client"
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     Palette, Library, Component as ComponentIcon, ChevronDown, Type, CreditCard, AlertCircle, Table, Square, AppWindow, PanelLeft,
-    CircleAlert, User as AvatarIcon, Badge, Calendar, CheckSquare, Bold, GitBranch, LayoutGrid, Menu,
+    CircleAlert, User as AvatarIcon, Badge as BadgeIcon, Calendar, CheckSquare, Bold, GitBranch, LayoutGrid, Menu,
     Pipette, Pointer, Ratio, Rows, VenetianMask, Sliders, ToggleRight, ListTree, MousePointer, MessageSquare, PanelTop,
     BarChart2, Shell, Framer, AreaChart, Wand2
 } from 'lucide-react';
@@ -30,13 +29,23 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { UserMenu } from '@/components/user-menu';
 import { GlobalFontUpdater } from '../global-font-updater';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from '../ui/button';
+import { THEMES } from '@/lib/style-guide-data';
+import { cn } from '@/lib/utils';
+import PageClient from '@/app/page-client';
 
 const components = [
     { name: 'Accordion', icon: Rows, slug: 'accordion' },
     { name: 'Alert', icon: AlertCircle, slug: 'alert' },
     { name: 'Alert Dialog', icon: CircleAlert, slug: 'alert-dialog' },
     { name: 'Avatar', icon: AvatarIcon, slug: 'avatar' },
-    { name: 'Badge', icon: Badge, slug: 'badge' },
+    { name: 'Badge', icon: BadgeIcon, slug: 'badge' },
     { name: 'Button', icon: Pointer, slug: 'button' },
     { name: 'Calendar', icon: Calendar, slug: 'calendar' },
     { name: 'Card', icon: CreditCard, slug: 'card' },
@@ -70,18 +79,63 @@ const components = [
     { name: 'Typography', icon: Type, slug: 'typography' },
 ];
 
+function ThemeSwitcher({ activeTheme, onThemeChange }: { activeTheme: string, onThemeChange: (theme: string) => void }) {
+    const activeThemeLabel = THEMES.find(t => t.name === activeTheme)?.label || "Default";
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-40 justify-between">
+                    {activeThemeLabel}
+                    <ChevronDown className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-40">
+                {THEMES.map(theme => (
+                    <DropdownMenuItem
+                        key={theme.name}
+                        onClick={() => onThemeChange(theme.name)}
+                        className={cn(activeTheme === theme.name && "font-bold")}
+                    >
+                        {theme.label}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
 
 function ComponentsSubMenu() {
     const pathname = usePathname();
     const { state } = useSidebar();
-    const [isOpen, setIsOpen] = React.useState(pathname.startsWith('/components'));
+    const [isOpen, setIsOpen] = useState(false);
+    const [isClient, setIsClient] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        if(isClient) {
+            setIsOpen(pathname.startsWith('/components'));
+        }
+    }, [pathname, isClient]);
+
+    useEffect(() => {
         if (state === 'collapsed') {
             setIsOpen(false);
         }
     }, [state]);
 
+    if (!isClient) {
+        return (
+            <SidebarMenuButton>
+                <ComponentIcon />
+                <span>Components</span>
+                <ChevronDown className="ml-auto h-4 w-4 shrink-0" />
+            </SidebarMenuButton>
+        );
+    }
+    
     return (
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger asChild>
@@ -123,6 +177,21 @@ export default function LiveStyleGuide({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [activeTheme, setActiveTheme] = useState('default');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const pageContent = () => {
+    // We need to pass the activeTheme to the children
+    // This is a bit of a hack, but it's the only way to do it without context
+    if (React.isValidElement(children) && (children.type === PageClient)) {
+        return React.cloneElement(children as React.ReactElement<{ activeTheme: string }>, { activeTheme });
+    }
+    return children;
+  }
 
   return (
     <SidebarProvider>
@@ -170,15 +239,17 @@ export default function LiveStyleGuide({
       <SidebarInset>
         <GlobalFontUpdater />
         <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 h-16 bg-surface/80 backdrop-blur-sm border-b border-border">
-          <SidebarTrigger />
+            <div className="flex items-center gap-4">
+                <SidebarTrigger />
+                {isClient && <ThemeSwitcher activeTheme={activeTheme} onThemeChange={setActiveTheme} />}
+            </div>
           <div className="flex items-center gap-4">
             <UserMenu />
             <ThemeToggle />
           </div>
         </header>
-        <main>{children}</main>
+        <main>{pageContent()}</main>
       </SidebarInset>
     </SidebarProvider>
   );
 }
-    

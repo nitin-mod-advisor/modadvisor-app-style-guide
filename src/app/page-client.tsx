@@ -2,7 +2,7 @@
 "use client"
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { doc, collection, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, getDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -17,8 +17,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { THEMES } from '@/lib/style-guide-data';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const PALETTE_ID = "default-palette";
+const PALETTES_COLLECTION = "palettes";
 const ALLOWED_USERS_COLLECTION = "allowed_users";
 
 const formSchema = z.object({
@@ -125,7 +127,7 @@ function AddVariableDialog({ onAddVariable, disabled }: { onAddVariable: (variab
   )
 }
 
-export default function PageClient() {
+export default function PageClient({ activeTheme }: { activeTheme: string }) {
   const [tokens, setTokens] = useState<ColorToken[]>([]);
   const [isClient, setIsClient] = React.useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -136,9 +138,9 @@ export default function PageClient() {
   const { toast } = useToast();
   
   const paletteRef = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return doc(firestore, "palettes", PALETTE_ID);
-  }, [firestore]);
+    if (!firestore || !activeTheme) return null;
+    return doc(firestore, PALETTES_COLLECTION, activeTheme);
+  }, [firestore, activeTheme]);
 
   const { data: paletteData, isLoading: isPaletteLoading } = useDoc<ColorPaletteType>(paletteRef);
   
@@ -209,8 +211,31 @@ export default function PageClient() {
   useEffect(() => {
     if (paletteData) {
       setTokens(paletteData.tokens);
-    } 
-  }, [paletteData, isPaletteLoading, paletteRef]);
+    } else if (!isPaletteLoading && firestore) {
+      // If data is null and we're not loading, it might be the first run.
+      // Let's check if the palettes exist and create them if they don't.
+      const palettesColRef = collection(firestore, PALETTES_COLLECTION);
+      getDocs(palettesColRef).then(snapshot => {
+        if (snapshot.empty) {
+          // No palettes exist, let's create them all.
+          const batch = THEMES.map(theme => {
+            const newPaletteRef = doc(firestore, PALETTES_COLLECTION, theme.name);
+            return setDocumentNonBlocking(newPaletteRef, { id: theme.name, tokens: theme.tokens }, { merge: false });
+          });
+          Promise.all(batch).then(() => {
+            console.log("All themes bootstrapped to Firestore.");
+            // The useDoc hook will refetch the data automatically.
+          });
+        } else {
+           // Data for this specific theme just doesn't exist, use local.
+           const localTheme = THEMES.find(t => t.name === activeTheme);
+           if (localTheme) {
+             setTokens(localTheme.tokens);
+           }
+        }
+      });
+    }
+  }, [paletteData, isPaletteLoading, firestore, activeTheme]);
   
   // Effect to dynamically update CSS variables in the document head
   useEffect(() => {
@@ -278,13 +303,21 @@ ${darkVars}
     updateTokens(newTokens);
   };
   
-  if (!isClient || isUserLoading || (isPaletteLoading && !paletteData)) {
+  const isLoading = isUserLoading || isPaletteLoading;
+  
+  if (!isClient) {
     return (
-        <div className="flex items-center justify-center h-screen">
-            <p>Loading style guide...</p>
+        <div className="p-4 sm:p-6 lg:p-8 space-y-8">
+            <div className="flex justify-between items-center">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-10 w-32" />
+            </div>
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-96 w-full" />
         </div>
     );
   }
+
 
   const canEdit = isAuthorized && !user?.isAnonymous;
 
@@ -294,7 +327,12 @@ ${darkVars}
         <h2 className="text-2xl font-bold">Color Palette</h2>
         <AddVariableDialog onAddVariable={handleAddVariable} disabled={!canEdit} />
       </div>
-      {tokens.length > 0 ? (
+      {isLoading ? (
+        <div className="space-y-4">
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-96 w-full" />
+        </div>
+      ) : tokens.length > 0 ? (
         <>
           <ColorPalette tokens={tokens} onColorChange={handleColorChange} disabled={!canEdit} />
           <CodePreviews tokens={tokens} />

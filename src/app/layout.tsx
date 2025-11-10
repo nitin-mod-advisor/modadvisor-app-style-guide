@@ -3,7 +3,6 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from "@/components/ui/toaster";
-import LiveStyleGuide from '@/components/style-guide/live-style-guide';
 import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
@@ -30,9 +29,7 @@ export default function RootLayout({
             defaultTheme="light"
             enableSystem
           >
-            <LiveStyleGuide>
-              {children}
-            </LiveStyleGuide>
+            {children}
             <Toaster />
           </ThemeProvider>
         </FirebaseClientProvider>
