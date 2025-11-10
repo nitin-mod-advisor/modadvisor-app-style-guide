@@ -220,7 +220,7 @@ export default function PageClient({ activeTheme }: { activeTheme: string }) {
           // No palettes exist, let's create them all.
           console.log("No palettes found in Firestore, bootstrapping...");
           const batch = THEMES.map(theme => {
-            const newPaletteRef = doc(firestore, PALETtes_COLLECTION, theme.name);
+            const newPaletteRef = doc(firestore, PALETTES_COLLECTION, theme.name);
             return setDocumentNonBlocking(newPaletteRef, { id: theme.name, tokens: theme.tokens }, { merge: false });
           });
           Promise.all(batch).then(() => {
