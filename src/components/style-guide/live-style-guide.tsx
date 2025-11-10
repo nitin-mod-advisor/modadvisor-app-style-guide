@@ -80,6 +80,15 @@ const components = [
 ];
 
 function ThemeSwitcher({ activeTheme, onThemeChange }: { activeTheme: string, onThemeChange: (theme: string) => void }) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return <Button variant="outline" className="w-40 justify-between">&nbsp;</Button>;
+  }
     const activeThemeLabel = THEMES.find(t => t.name === activeTheme)?.label || "Default";
     return (
         <DropdownMenu>
@@ -178,15 +187,9 @@ export default function LiveStyleGuide({
 }) {
   const pathname = usePathname();
   const [activeTheme, setActiveTheme] = useState('default');
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const pageContent = () => {
     // We need to pass the activeTheme to the children
-    // This is a bit of a hack, but it's the only way to do it without context
     if (React.isValidElement(children) && (children.type === PageClient)) {
         return React.cloneElement(children as React.ReactElement<{ activeTheme: string }>, { activeTheme });
     }
@@ -238,10 +241,10 @@ export default function LiveStyleGuide({
       </Sidebar>
       <SidebarInset>
         <GlobalFontUpdater />
-        <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 h-16 bg-surface/80 backdrop-blur-sm border-b border-border">
+        <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 h-16 bg-card/80 backdrop-blur-sm border-b border-border">
             <div className="flex items-center gap-4">
                 <SidebarTrigger />
-                {isClient && <ThemeSwitcher activeTheme={activeTheme} onThemeChange={setActiveTheme} />}
+                <ThemeSwitcher activeTheme={activeTheme} onThemeChange={setActiveTheme} />
             </div>
           <div className="flex items-center gap-4">
             <UserMenu />
