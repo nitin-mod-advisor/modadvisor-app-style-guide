@@ -220,7 +220,7 @@ export default function PageClient({ activeTheme }: { activeTheme: string }) {
           // No palettes exist, let's create them all.
           console.log("No palettes found in Firestore, bootstrapping...");
           const batch = THEMES.map(theme => {
-            const newPaletteRef = doc(firestore, PALETTES_COLLECTION, theme.name);
+            const newPaletteRef = doc(firestore, PALETtes_COLLECTION, theme.name);
             return setDocumentNonBlocking(newPaletteRef, { id: theme.name, tokens: theme.tokens }, { merge: false });
           });
           Promise.all(batch).then(() => {
@@ -237,45 +237,6 @@ export default function PageClient({ activeTheme }: { activeTheme: string }) {
       });
     }
   }, [paletteData, isPaletteLoading, firestore, activeTheme]);
-  
-  // Effect to dynamically update CSS variables in the document head
-  useEffect(() => {
-    if (typeof window === 'undefined' || !isClient || tokens.length === 0) return;
-
-    const styleId = 'dynamic-theme-styles';
-    let styleTag = document.getElementById(styleId) as HTMLStyleElement | null;
-    if (!styleTag) {
-      styleTag = document.createElement('style');
-      styleTag.id = styleId;
-      document.head.appendChild(styleTag);
-    }
-    
-    const lightVars = tokens.map(token => {
-        const value = token.light.startsWith('hsl') 
-            ? token.light.replace('hsl(', '').replace(')', '').replace(/%/g, '')
-            : token.light;
-        return `  ${token.name}: ${value};`;
-    }).join('\n');
-
-    const darkVars = tokens.map(token => {
-        const value = token.dark.startsWith('hsl') 
-            ? token.dark.replace('hsl(', '').replace(')', '').replace(/%/g, '')
-            : token.dark;
-        return `  ${token.name}: ${value};`;
-    }).join('\n');
-    
-    const css = `
-:root {
-${lightVars}
-}
-
-.dark {
-${darkVars}
-}`;
-
-    styleTag.innerHTML = css;
-
-  }, [tokens, isClient]);
 
   const updateTokens = (newTokens: ColorToken[]) => {
     if (!isAuthorized) {

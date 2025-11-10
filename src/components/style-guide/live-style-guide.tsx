@@ -89,28 +89,29 @@ function ThemeSwitcher({ activeTheme, onThemeChange }: { activeTheme: string, on
   if (!isClient) {
     return <Button variant="outline" className="w-40 justify-between">&nbsp;</Button>;
   }
-    const activeThemeLabel = THEMES.find(t => t.name === activeTheme)?.label || "Default";
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-40 justify-between">
-                    {activeThemeLabel}
-                    <ChevronDown className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40">
-                {THEMES.map(theme => (
-                    <DropdownMenuItem
-                        key={theme.name}
-                        onClick={() => onThemeChange(theme.name)}
-                        className={cn(activeTheme === theme.name && "font-bold")}
-                    >
-                        {theme.label}
-                    </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-        </DropdownMenu>
-    );
+
+  const activeThemeLabel = THEMES.find(t => t.name === activeTheme)?.label || "Default";
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="w-40 justify-between">
+          {activeThemeLabel}
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-40">
+        {THEMES.map(theme => (
+          <DropdownMenuItem
+            key={theme.name}
+            onClick={() => onThemeChange(theme.name)}
+            className={cn(activeTheme === theme.name && "font-bold")}
+          >
+            {theme.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 function ComponentsSubMenu() {
@@ -136,7 +137,7 @@ function ComponentsSubMenu() {
     }, [state]);
 
     if (!isClient) {
-        return (
+         return (
             <SidebarMenuButton>
                 <ComponentIcon />
                 <span>Components</span>
@@ -201,9 +202,12 @@ export default function LiveStyleGuide({
       
       const childProps = (child as any).props;
       const newProps: { [key: string]: any } = {
-        activeTheme: activeTheme,
-        onThemeChange: onThemeChange,
+        activeTheme: activeTheme
       };
+
+      if (child.type === PageClient) {
+          newProps.onThemeChange = onThemeChange;
+      }
 
       if (childProps && childProps.children) {
         newProps.children = pageContent(childProps.children);
@@ -257,7 +261,7 @@ export default function LiveStyleGuide({
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <GlobalFontUpdater />
+        <GlobalFontUpdater activeTheme={activeTheme} />
         <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 h-16 bg-card/80 backdrop-blur-sm border-b border-border">
             <div className="flex items-center gap-4">
                 <SidebarTrigger />
@@ -273,4 +277,3 @@ export default function LiveStyleGuide({
     </SidebarProvider>
   );
 }
-
