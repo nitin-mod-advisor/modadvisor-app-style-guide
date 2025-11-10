@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { CheckCircle, Info, AlertTriangle, XCircle, Home, Settings, Calendar as CalendarIcon, Plus, User, Type } from 'lucide-react';
+import { CheckCircle, Info, AlertTriangle, XCircle, Home, Settings, Calendar as CalendarIcon, Plus, User, Type, Palette } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -1984,3 +1984,4 @@ const TypographyPreview = () => (
     
 
     
+

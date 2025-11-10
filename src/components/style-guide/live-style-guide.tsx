@@ -38,7 +38,7 @@ import {
 import { Button } from '../ui/button';
 import { THEMES } from '@/lib/style-guide-data';
 import { cn } from '@/lib/utils';
-import PageClient from '@/app/page-client';
+import { FloatingThemeEditor } from '../floating-theme-editor';
 
 const components = [
     { name: 'Accordion', icon: Rows, slug: 'accordion' },
@@ -203,14 +203,12 @@ export default function LiveStyleGuide({
     setActiveTheme(theme);
   };
   
-  // Pass props to the direct child of LiveStyleGuide.
-  // This avoids passing props to every single DOM element recursively.
-  const pageContent = React.isValidElement(children) 
-    ? React.cloneElement(children as React.ReactElement<any>, { 
-        activeTheme, 
-        onThemeChange 
-      }) 
-    : children;
+  const pageContent = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child, { activeTheme } as { activeTheme: string });
+    }
+    return child;
+  });
 
 
   return (
@@ -218,6 +216,10 @@ export default function LiveStyleGuide({
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
+            <svg className="w-6 h-6 block dark:hidden" viewBox="0 0 24 24" fill="hsl(var(--primary))" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" />
+              <path d="M2 7L12 12M22 7L12 12M12 22V12" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <svg className="w-6 h-6 hidden dark:block" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" fill="url(#grad1)"/>
               <path d="M2 7L12 12M22 7L12 12M12 22V12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -227,10 +229,6 @@ export default function LiveStyleGuide({
                   <stop offset="1" stopColor="rgba(255, 255, 255, 0)"/>
                 </linearGradient>
               </defs>
-            </svg>
-            <svg className="w-6 h-6 block dark:hidden" viewBox="0 0 24 24" fill="hsl(var(--primary))" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" />
-              <path d="M2 7L12 12M22 7L12 12M12 22V12" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             <h1 className="text-xl font-bold text-text">Style Guide</h1>
           </div>
@@ -280,9 +278,8 @@ export default function LiveStyleGuide({
           </div>
         </header>
         <main>{pageContent}</main>
+        <FloatingThemeEditor activeTheme={activeTheme} />
       </SidebarInset>
     </SidebarProvider>
   );
 }
-
-    
