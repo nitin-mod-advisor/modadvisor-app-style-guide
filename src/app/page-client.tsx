@@ -211,20 +211,21 @@ export default function PageClient({ activeTheme }: { activeTheme: string }) {
   useEffect(() => {
     if (paletteData) {
       setTokens(paletteData.tokens);
-    } else if (!isPaletteLoading && firestore) {
+    } else if (!isPaletteLoading && firestore && activeTheme) {
       // If data is null and we're not loading, it might be the first run.
       // Let's check if the palettes exist and create them if they don't.
       const palettesColRef = collection(firestore, PALETTES_COLLECTION);
       getDocs(palettesColRef).then(snapshot => {
         if (snapshot.empty) {
           // No palettes exist, let's create them all.
+          console.log("No palettes found in Firestore, bootstrapping...");
           const batch = THEMES.map(theme => {
             const newPaletteRef = doc(firestore, PALETTES_COLLECTION, theme.name);
             return setDocumentNonBlocking(newPaletteRef, { id: theme.name, tokens: theme.tokens }, { merge: false });
           });
           Promise.all(batch).then(() => {
             console.log("All themes bootstrapped to Firestore.");
-            // The useDoc hook will refetch the data automatically.
+            // The useDoc hook will refetch the data automatically for the current theme.
           });
         } else {
            // Data for this specific theme just doesn't exist, use local.
@@ -303,9 +304,9 @@ ${darkVars}
     updateTokens(newTokens);
   };
   
-  const isLoading = isUserLoading || isPaletteLoading;
+  const isLoading = isUserLoading || isPaletteLoading || !activeTheme;
   
-  if (!isClient) {
+  if (!isClient || isLoading) {
     return (
         <div className="p-4 sm:p-6 lg:p-8 space-y-8">
             <div className="flex justify-between items-center">
@@ -327,12 +328,7 @@ ${darkVars}
         <h2 className="text-2xl font-bold">Color Palette</h2>
         <AddVariableDialog onAddVariable={handleAddVariable} disabled={!canEdit} />
       </div>
-      {isLoading ? (
-        <div className="space-y-4">
-            <Skeleton className="h-48 w-full" />
-            <Skeleton className="h-96 w-full" />
-        </div>
-      ) : tokens.length > 0 ? (
+      {tokens.length > 0 ? (
         <>
           <ColorPalette tokens={tokens} onColorChange={handleColorChange} disabled={!canEdit} />
           <CodePreviews tokens={tokens} />

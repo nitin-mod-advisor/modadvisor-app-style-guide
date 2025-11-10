@@ -19,10 +19,10 @@ const PageClient = dynamic(() => import('@/app/page-client'), {
   ),
 })
 
-export default function Home() {
+export default function Home(props: any) {
   return (
     <LiveStyleGuide>
-        <PageClient activeTheme="default"/>
+        <PageClient {...props}/>
     </LiveStyleGuide>
   )
 }

@@ -188,13 +188,30 @@ export default function LiveStyleGuide({
   const pathname = usePathname();
   const [activeTheme, setActiveTheme] = useState('default');
 
-  const pageContent = () => {
-    // We need to pass the activeTheme to the children
-    if (React.isValidElement(children) && (children.type === PageClient)) {
-        return React.cloneElement(children as React.ReactElement<{ activeTheme: string }>, { activeTheme });
-    }
-    return children;
-  }
+  const onThemeChange = (theme: string) => {
+    setActiveTheme(theme);
+  };
+  
+  // Recursively clone children to pass down props
+  const pageContent = (children: React.ReactNode): React.ReactNode => {
+    return React.Children.map(children, child => {
+      if (!React.isValidElement(child)) {
+        return child;
+      }
+      
+      const childProps = (child as any).props;
+      const newProps: { [key: string]: any } = {
+        activeTheme: activeTheme,
+        onThemeChange: onThemeChange,
+      };
+
+      if (childProps && childProps.children) {
+        newProps.children = pageContent(childProps.children);
+      }
+      
+      return React.cloneElement(child, newProps);
+    });
+  };
 
   return (
     <SidebarProvider>
@@ -244,15 +261,16 @@ export default function LiveStyleGuide({
         <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 h-16 bg-card/80 backdrop-blur-sm border-b border-border">
             <div className="flex items-center gap-4">
                 <SidebarTrigger />
-                <ThemeSwitcher activeTheme={activeTheme} onThemeChange={setActiveTheme} />
+                <ThemeSwitcher activeTheme={activeTheme} onThemeChange={onThemeChange} />
             </div>
           <div className="flex items-center gap-4">
             <UserMenu />
             <ThemeToggle />
           </div>
         </header>
-        <main>{pageContent()}</main>
+        <main>{pageContent(children)}</main>
       </SidebarInset>
     </SidebarProvider>
   );
 }
+
