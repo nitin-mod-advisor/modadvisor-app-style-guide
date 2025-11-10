@@ -21,9 +21,6 @@ export default {
     {
       pattern: /^(rounded|opacity|shadow)-(sm|md|lg|xl|2xl|3xl|full|inner|none|[0-9]+)$/,
     },
-    {
-      pattern: /rounded-\[(1|2|4|8|12|16|20|24|32|40|48|56|64)px\]/,
-    }
   ],
   theme: {
     extend: {
@@ -122,3 +119,5 @@ export default {
   },
   plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 } satisfies Config;
+
+    

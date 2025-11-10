@@ -203,35 +203,35 @@ export default function LiveStyleGuide({
     setActiveTheme(theme);
   };
   
-  // Recursively clone children to pass down props
-  const pageContent = (children: React.ReactNode): React.ReactNode => {
-    return React.Children.map(children, child => {
-      if (!React.isValidElement(child)) {
-        return child;
-      }
-      
-      const childProps = (child as any).props;
-      const newProps: { [key: string]: any } = {
-        activeTheme: activeTheme,
-        onThemeChange: onThemeChange,
-      };
+  // Pass props to the direct child of LiveStyleGuide.
+  // This avoids passing props to every single DOM element recursively.
+  const pageContent = React.isValidElement(children) 
+    ? React.cloneElement(children as React.ReactElement<any>, { 
+        activeTheme, 
+        onThemeChange 
+      }) 
+    : children;
 
-      if (childProps && childProps.children) {
-        newProps.children = pageContent(childProps.children);
-      }
-      
-      return React.cloneElement(child, newProps);
-    });
-  };
 
   return (
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-primary/10 text-primary">
-              <Library className="w-6 h-6" />
-            </div>
+            <svg className="w-6 h-6 hidden dark:block" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" fill="url(#grad1)"/>
+              <path d="M2 7L12 12M22 7L12 12M12 22V12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <defs>
+                <linearGradient id="grad1" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="rgba(255, 255, 255, 0.5)"/>
+                  <stop offset="1" stopColor="rgba(255, 255, 255, 0)"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <svg className="w-6 h-6 block dark:hidden" viewBox="0 0 24 24" fill="hsl(var(--primary))" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" />
+              <path d="M2 7L12 12M22 7L12 12M12 22V12" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <h1 className="text-xl font-bold text-text">Style Guide</h1>
           </div>
         </SidebarHeader>
@@ -239,7 +239,7 @@ export default function LiveStyleGuide({
           <SidebarMenu>
             <SidebarMenuItem>
               <Link href="/">
-                <SidebarMenuButton isActive={pathname === '/'}>
+                <SidebarMenuButton isActive={pathname === '/'} data-active={pathname === '/'}>
                   <Palette />
                   <span>Color Palette</span>
                 </SidebarMenuButton>
@@ -247,7 +247,7 @@ export default function LiveStyleGuide({
             </SidebarMenuItem>
             <SidebarMenuItem>
               <Link href="/typography">
-                <SidebarMenuButton isActive={pathname === '/typography'}>
+                <SidebarMenuButton isActive={pathname === '/typography'} data-active={pathname === '/typography'}>
                   <Type />
                   <span>Fonts</span>
                 </SidebarMenuButton>
@@ -258,7 +258,7 @@ export default function LiveStyleGuide({
             </SidebarMenuItem>
              <SidebarMenuItem>
               <Link href="/layout-creator">
-                <SidebarMenuButton isActive={pathname === '/layout-creator'}>
+                <SidebarMenuButton isActive={pathname === '/layout-creator'} data-active={pathname === '/layout-creator'}>
                   <Wand2 />
                   <span>Create Layout</span>
                 </SidebarMenuButton>
@@ -279,8 +279,10 @@ export default function LiveStyleGuide({
             <ThemeToggle />
           </div>
         </header>
-        <main>{pageContent(children)}</main>
+        <main>{pageContent}</main>
       </SidebarInset>
     </SidebarProvider>
   );
 }
+
+    
