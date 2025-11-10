@@ -28,7 +28,7 @@ import {
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { UserMenu } from '@/components/user-menu';
-import { GlobalFontUpdater } from '../global-font-updater';
+import { GlobalStyleUpdater } from '@/components/global-style-updater';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -117,8 +117,8 @@ function ThemeSwitcher({ activeTheme, onThemeChange }: { activeTheme: string, on
 function ComponentsSubMenu() {
     const pathname = usePathname();
     const { state } = useSidebar();
-    const [isOpen, setIsOpen] = useState(false);
     const [isClient, setIsClient] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
@@ -187,7 +187,17 @@ export default function LiveStyleGuide({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [activeTheme, setActiveTheme] = useState('default');
+  const [activeTheme, setActiveTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('activeTheme') || 'default';
+    }
+    return 'default';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('activeTheme', activeTheme);
+  }, [activeTheme]);
+  
 
   const onThemeChange = (theme: string) => {
     setActiveTheme(theme);
@@ -202,12 +212,9 @@ export default function LiveStyleGuide({
       
       const childProps = (child as any).props;
       const newProps: { [key: string]: any } = {
-        activeTheme: activeTheme
+        activeTheme: activeTheme,
+        onThemeChange: onThemeChange,
       };
-
-      if (child.type === PageClient) {
-          newProps.onThemeChange = onThemeChange;
-      }
 
       if (childProps && childProps.children) {
         newProps.children = pageContent(childProps.children);
@@ -261,7 +268,7 @@ export default function LiveStyleGuide({
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <GlobalFontUpdater activeTheme={activeTheme} />
+        <GlobalStyleUpdater activeTheme={activeTheme} />
         <header className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 h-16 bg-card/80 backdrop-blur-sm border-b border-border">
             <div className="flex items-center gap-4">
                 <SidebarTrigger />

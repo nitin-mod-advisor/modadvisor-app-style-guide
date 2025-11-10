@@ -11,7 +11,7 @@ const TYPOGRAPHY_SETTINGS_ID = "typography";
 const SETTINGS_COLLECTION = "settings";
 const PALETTES_COLLECTION = "palettes";
 
-export function GlobalFontUpdater({ activeTheme }: { activeTheme: string }) {
+export function GlobalStyleUpdater({ activeTheme }: { activeTheme: string }) {
   const firebaseContext = useContext(FirebaseContext);
 
   if (!firebaseContext || !firebaseContext.firestore) {
