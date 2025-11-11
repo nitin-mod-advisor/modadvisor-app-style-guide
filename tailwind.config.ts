@@ -1,4 +1,3 @@
-
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -24,10 +23,6 @@ export default {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        'logo-black': "url('/logo_black.png')",
-        'logo-white': "url('/logo_white.png')",
-      },
       fontFamily: {
         body: ['var(--font-body)', 'Inter', 'sans-serif'],
         headline: ['var(--font-headline)', 'Inter', 'sans-serif'],
@@ -123,5 +118,3 @@ export default {
   },
   plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 } satisfies Config;
-
-    
