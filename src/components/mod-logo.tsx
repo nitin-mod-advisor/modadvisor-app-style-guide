@@ -9,19 +9,21 @@ export function ModLogo({ className }: { className?: string }) {
     <div className={cn("relative w-8 h-8", className)}>
       {/* Black logo for light mode */}
       <Image
-        src="/logo-black.png"
+        src="/logo_black.png"
         alt="Logo"
         width={32}
         height={32}
         className="dark:hidden"
+        unoptimized
       />
       {/* White logo for dark mode */}
       <Image
-        src="/logo-white.png"
+        src="/logo_white.png"
         alt="Logo"
         width={32}
         height={32}
         className="hidden dark:block"
+        unoptimized
       />
     </div>
   );
