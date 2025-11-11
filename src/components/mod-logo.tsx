@@ -13,7 +13,7 @@ export function ModLogo({ className }: { className?: string }) {
         alt="Logo"
         width={32}
         height={32}
-        className="dark:hidden"
+        className="block dark:hidden"
         unoptimized
       />
       {/* White logo for dark mode */}
