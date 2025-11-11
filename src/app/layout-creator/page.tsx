@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel, FormDes
 import { generateLayout } from '@/ai/flows/generate-layout';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
+import LiveStyleGuide from '@/components/style-guide/live-style-guide';
 
 // Import all the components that the AI can use
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -128,8 +129,7 @@ const DynamicComponent = ({ jsx }: { jsx: string }) => {
   return <>{Component}</>;
 };
 
-
-export default function LayoutCreatorPage() {
+function LayoutCreatorContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -317,4 +317,13 @@ export default function LayoutCreatorPage() {
       </div>
     </div>
   );
+}
+
+
+export default function LayoutCreatorPage() {
+    return (
+        <LiveStyleGuide>
+            <LayoutCreatorContent />
+        </LiveStyleGuide>
+    )
 }

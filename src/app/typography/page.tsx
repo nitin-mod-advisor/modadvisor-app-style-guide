@@ -3,6 +3,7 @@
 
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
+import LiveStyleGuide from '@/components/style-guide/live-style-guide';
 
 const TypographyClient = dynamic(() => import('@/app/typography-client'), {
   ssr: false,
@@ -16,5 +17,9 @@ const TypographyClient = dynamic(() => import('@/app/typography-client'), {
 })
 
 export default function TypographyPage() {
-  return <TypographyClient />
+  return (
+    <LiveStyleGuide>
+        <TypographyClient />
+    </LiveStyleGuide>
+  )
 }
