@@ -24,6 +24,10 @@ export default {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        'logo-black': "url('/logo_black.png')",
+        'logo-white': "url('/logo_white.png')",
+      },
       fontFamily: {
         body: ['var(--font-body)', 'Inter', 'sans-serif'],
         headline: ['var(--font-headline)', 'Inter', 'sans-serif'],
